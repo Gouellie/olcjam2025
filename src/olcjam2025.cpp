@@ -8,6 +8,7 @@
 #undef __SCROLL_IMPL__
 
 #include "Object.h"
+#include "World.h"
 #include "orxExtensions.h"
 
 #ifdef __orxMSVC__
@@ -94,6 +95,7 @@ void olcjam2025::BindObjects()
 {
   // Bind the Object class
   BindObject(Object);
+  BindObject(World);
 }
 
 /** Bootstrap function, it is called before config is initialized, allowing for early resource storage definitions
