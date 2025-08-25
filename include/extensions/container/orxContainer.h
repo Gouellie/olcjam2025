@@ -240,24 +240,24 @@ static orxSTATUS orxFASTCALL orxContainer_EventHandler(const orxEVENT *_pstEvent
   {
     orxS32                i, listSize = 0;
     orxOBJECT*            listSorted[orxCONTAINER_KU32_BANK_SIZE]{};
-    orxOBJECT**           ppstObject;
+    orxU64*               pstGUID;
+    orxOBJECT*            pstObject;
 
     /* For all containers objects */
-    for (ppstObject = (orxOBJECT**)orxBank_GetNext(sstObject.pstContainerBank, orxNULL);
-      ppstObject != orxNULL;
-      ppstObject = (orxOBJECT**)orxBank_GetNext(sstObject.pstContainerBank, ppstObject))
+    for (pstGUID = (orxU64*)orxBank_GetNext(sstObject.pstContainerBank, orxNULL);
+        pstGUID != orxNULL;
+        pstGUID = (orxU64*)orxBank_GetNext(sstObject.pstContainerBank, pstGUID))
     {
       /* Still valid? */
-      if (orxOBJECT(*ppstObject) != orxNULL)
+      if (pstObject = orxOBJECT(orxStructure_Get(*pstGUID)))
       {
-        listSorted[listSize] = (*ppstObject);
+        listSorted[listSize] = pstObject;
         listSize++;
       }
       else
       {
         /* Free */
-        orxBank_Free(sstObject.pstContainerBank, ppstObject);
-        ppstObject = orxNULL;
+        orxBank_Free(sstObject.pstContainerBank, pstGUID);
       }
     }
 
@@ -301,7 +301,7 @@ void orxContainer_Init()
   if (eResult != orxSTATUS_FAILURE)
   {
     /* Creates banks */
-    sstObject.pstContainerBank = orxBank_Create(orxCONTAINER_KU32_BANK_SIZE, sizeof(orxOBJECT*), orxBANK_KU32_FLAG_NONE, orxMEMORY_TYPE_MAIN);
+    sstObject.pstContainerBank = orxBank_Create(orxCONTAINER_KU32_BANK_SIZE, sizeof(orxU64), orxBANK_KU32_FLAG_NONE, orxMEMORY_TYPE_MAIN);
   }
 
   /* Adds event handler */
