@@ -6,3 +6,5 @@ bin/imgui.ini
 *.pdb
 *.cih
 *.obr
+bin
+*.exe
