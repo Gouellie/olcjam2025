@@ -241,17 +241,19 @@ static orxSTATUS orxFASTCALL orxContainer_EventHandler(const orxEVENT *_pstEvent
     orxS32                i, listSize = 0;
     orxOBJECT*            listSorted[orxCONTAINER_KU32_BANK_SIZE]{};
     orxU64*               pstGUID;
-    orxOBJECT*            pstObject;
+    orxContainerObject*   poContainerObject;
 
     /* For all containers objects */
     for (pstGUID = (orxU64*)orxBank_GetNext(sstObject.pstContainerBank, orxNULL);
         pstGUID != orxNULL;
         pstGUID = (orxU64*)orxBank_GetNext(sstObject.pstContainerBank, pstGUID))
     {
+      poContainerObject = (orxContainerObject*)ScrollBase::GetInstance().GetObject(*pstGUID);
+
       /* Still valid? */
-      if (pstObject = orxOBJECT(orxStructure_Get(*pstGUID)))
+      if (poContainerObject != orxNULL)
       {
-        listSorted[listSize] = pstObject;
+        listSorted[listSize] = poContainerObject->GetOrxObject();
         listSize++;
       }
       else

@@ -8,6 +8,7 @@
 #undef __SCROLL_IMPL__
 
 #include "Object.h"
+#include "Vessel.h"
 #include "World.h"
 #include "orxExtensions.h"
 
@@ -94,6 +95,7 @@ void olcjam2025::Exit()
 void olcjam2025::BindObjects()
 {
   BindObject(Object);
+  BindObject(Vessel);
   BindObject(World);
   BindObject(orxContainerObject);
 }

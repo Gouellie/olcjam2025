@@ -24,8 +24,7 @@ private:
 
                 void            ApplySettings();
 
-                orxVECTOR       m_PreviousCameraPos;
-                orxOBJECT*      m_Camera;
+                orxVECTOR       m_PreviousPlayerPos;
                 orxHASHTABLE*   m_WorldTable;
                 orxS32          m_Settings;
                 orxU64          m_Universe;
