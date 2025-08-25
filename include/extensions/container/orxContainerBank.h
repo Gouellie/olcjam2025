@@ -37,11 +37,11 @@ orxSTATUS orxContainerBank_RegisterContainer(orxOBJECT* _pstObject)
   // Valid?
   if (_pstObject != orxNULL)
   {
-    orxOBJECT** ppstObject;
+    orxU64* pstGUID;
     /* Adds it to the bank */
-    ppstObject = (orxOBJECT**)orxBank_Allocate(sstObject.pstContainerBank);
-    orxASSERT(ppstObject != orxNULL);
-    *ppstObject = _pstObject;
+    pstGUID = (orxU64*)orxBank_Allocate(sstObject.pstContainerBank);
+    orxASSERT(pstGUID != orxNULL);
+    *pstGUID = orxStructure_GetGUID(_pstObject);;
 
     // Update status
     eResult = orxSTATUS_SUCCESS;
