@@ -34,11 +34,10 @@ void World::OnCreate()
     m_Camera = orxObject_CreateFromConfig("Camera");
     orxObject_GetPosition(m_Camera, &m_PreviousCameraPos);
 
-    // Create universe
-    m_Universe = orxStructure_GetGUID(orxObject_CreateFromConfig("Universe"));
-
     // Init settings
     m_Settings = orxConfig_GetListCount("Settings") / 2;
+
+    // Create universe
     ApplySettings();
 
     // Register event handler to set the cell as owner of spawned objects
@@ -55,7 +54,7 @@ void World::OnDelete()
 
 void World::Update(const orxCLOCK_INFO &_rstInfo)
 {
-    orxConfig_PushSection("World");
+    PushConfigSection();
 
     // Update camera
     orxVECTOR CameraMove, CameraSpeed, CameraHighSpeed, CameraPos;
@@ -90,6 +89,7 @@ void World::Update(const orxCLOCK_INFO &_rstInfo)
     // Get cell positions
     orxVECTOR CellPos, PreviousCellPos;
     orxFLOAT  CellSize = orxConfig_GetFloat("CellSize");
+
     orxVector_Round(&CellPos, orxVector_Divf(&CellPos, &CameraPos, CellSize));
     orxVector_Round(&PreviousCellPos, orxVector_Divf(&PreviousCellPos, &m_PreviousCameraPos, CellSize));
 
@@ -186,5 +186,5 @@ void World::Update(const orxCLOCK_INFO &_rstInfo)
         }
     }
 
-    orxConfig_PopSection(); // World
+    PopConfigSection(); // World
 }
