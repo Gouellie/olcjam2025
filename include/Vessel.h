@@ -25,6 +25,7 @@ private:
 
                 orxVECTOR       m_PreviousCameraPos;
                 orxOBJECT*      m_Camera;
+                orxOBJECT*      m_Harvester;
 };
 
 #endif // __VESSEL_H__

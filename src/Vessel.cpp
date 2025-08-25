@@ -52,5 +52,19 @@ void Vessel::Update(const orxCLOCK_INFO &_rstInfo)
         orxObject_AddTimeLineTrack(m_Camera, "ZoomIn");
     }
 
+    if (orxInput_HasBeenActivated("Harvest"))
+    {
+        m_Harvester = orxObject_CreateFromConfig("Harvest");
+        orxObject_SetOwner(m_Harvester, GetOrxObject());
+        orxObject_SetParent(m_Harvester, GetOrxObject());
+    }
+    else if (orxInput_HasBeenDeactivated("Harvest"))
+    {
+        if (orxOBJECT(m_Harvester) != orxNULL) 
+        {
+            orxObject_SetLifeTime(m_Harvester, orxFLOAT_0);
+        }
+    }
+
     PopConfigSection();
 }
