@@ -65,7 +65,7 @@ orxSTATUS olcjam2025::Init()
   }
 
   // Create the scene
-  CreateObject("Scene");
+  CreateObject("Startup");
 
   // Done!
   return orxSTATUS_SUCCESS;
@@ -93,9 +93,9 @@ void olcjam2025::Exit()
  */
 void olcjam2025::BindObjects()
 {
-  // Bind the Object class
   BindObject(Object);
   BindObject(World);
+  BindObject(orxContainerObject);
 }
 
 /** Bootstrap function, it is called before config is initialized, allowing for early resource storage definitions
