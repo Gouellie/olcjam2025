@@ -64,7 +64,7 @@ void CameraBox::Update(const orxCLOCK_INFO& _rstInfo)
     //Move the camera and smoothing
     m_DesiredPos = *orxVector_Add(&m_DesiredPos, &m_TargetLock, &delta);
     m_TargetLock = m_DesiredPos;
-    orxVECTOR pos = *orxVector_Lerp(&pos, &cameraPrevPos, &m_DesiredPos, orxConfig_GetFloat("LerpSpeed"));
+    orxVECTOR pos = *orxVector_Lerp(&pos, &cameraPrevPos, &m_DesiredPos, orxConfig_GetFloat("LerpSpeed") * _rstInfo.fDT);
     orxObject_SetPosition(m_Camera, &pos);
 
     orxConfig_PopSection();
