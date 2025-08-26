@@ -24,22 +24,26 @@ void Vessel::Update(const orxCLOCK_INFO &_rstInfo)
 {
     PushConfigSection();
 
-    // Update player (and camera) position
-    orxVECTOR PlayerMove, PlayerSpeed, PlayerHighSpeed, PlayerPos;
-    orxVector_Mulf(&PlayerMove,
-        orxVector_Mul(&PlayerMove,
-            orxVector_Set(&PlayerMove,
-                orxInput_GetValue("Right") - orxInput_GetValue("Left"),
-                orxInput_GetValue("Down") - orxInput_GetValue("Up"),
-                orxFLOAT_0),
-            orxVector_Lerp(&PlayerSpeed,
-                orxConfig_GetListVector("MovingSpeed", 0, &PlayerSpeed),
-                orxConfig_GetListVector("MovingSpeed", 1, &PlayerHighSpeed),
-                orxInput_GetValue("Fast"))),
-        _rstInfo.fDT);
-    orxObject_SetPosition(GetOrxObject(), orxVector_Add(&PlayerPos,
-        orxObject_GetPosition(GetOrxObject(), &PlayerPos),
-        orxVector_Round(&PlayerMove, &PlayerMove)));
+    // Temporary solution, will eventually be allowed to move and aim the vacuum at the same time
+    if (!orxInput_IsActive("Vacuum"))
+    {
+        // Update player (and camera) position
+        orxVECTOR PlayerMove, PlayerSpeed, PlayerHighSpeed, PlayerPos;
+        orxVector_Mulf(&PlayerMove,
+            orxVector_Mul(&PlayerMove,
+                orxVector_Set(&PlayerMove,
+                    orxInput_GetValue("Right") - orxInput_GetValue("Left"),
+                    orxInput_GetValue("Down") - orxInput_GetValue("Up"),
+                    orxFLOAT_0),
+                orxVector_Lerp(&PlayerSpeed,
+                    orxConfig_GetListVector("MovingSpeed", 0, &PlayerSpeed),
+                    orxConfig_GetListVector("MovingSpeed", 1, &PlayerHighSpeed),
+                    orxInput_GetValue("Fast"))),
+            _rstInfo.fDT);
+        orxObject_SetPosition(GetOrxObject(), orxVector_Add(&PlayerPos,
+            orxObject_GetPosition(GetOrxObject(), &PlayerPos),
+            orxVector_Round(&PlayerMove, &PlayerMove)));
+    }
 
     // Zoom Out?
     if (orxInput_HasBeenActivated("Zoom"))
@@ -52,17 +56,17 @@ void Vessel::Update(const orxCLOCK_INFO &_rstInfo)
         orxObject_AddTimeLineTrack(m_Camera, "ZoomIn");
     }
 
-    if (orxInput_HasBeenActivated("Harvest"))
+    if (orxInput_HasBeenActivated("Vacuum"))
     {
-        m_Harvester = orxObject_CreateFromConfig("Harvest");
-        orxObject_SetOwner(m_Harvester, GetOrxObject());
-        orxObject_SetParent(m_Harvester, GetOrxObject());
+        m_Vacuum = orxObject_CreateFromConfig("Vacuum");
+        orxObject_SetOwner(m_Vacuum, GetOrxObject());
+        orxObject_SetParent(m_Vacuum, GetOrxObject());
     }
-    else if (orxInput_HasBeenDeactivated("Harvest"))
+    else if (orxInput_HasBeenDeactivated("Vacuum"))
     {
-        if (orxOBJECT(m_Harvester) != orxNULL) 
+        if (orxOBJECT(m_Vacuum) != orxNULL)
         {
-            orxObject_SetLifeTime(m_Harvester, orxFLOAT_0);
+            orxObject_SetLifeTime(m_Vacuum, orxFLOAT_0);
         }
     }
 
