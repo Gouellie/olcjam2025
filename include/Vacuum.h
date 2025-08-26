@@ -25,6 +25,8 @@ protected:
 
 
 private:
+
+    orxFLOAT        m_DesiredRotation = orxFLOAT_0;
 };
 
 #endif // __VACUUM_H__

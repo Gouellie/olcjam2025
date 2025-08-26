@@ -5,6 +5,20 @@
 
 #include "Vacuum.h"
 
+static orxFLOAT orxFASTCALL angle_difference(orxFLOAT p_from, orxFLOAT p_to) {
+    orxFLOAT difference = orxMath_Mod(p_to - p_from, orxMATH_KF_2_PI);
+    return orxMath_Mod(2.0f * difference, orxMATH_KF_2_PI) - difference;
+}
+
+static orxFLOAT orxFASTCALL lerp_angle(orxFLOAT p_from, orxFLOAT p_to, orxFLOAT p_weight) {
+    return p_from + angle_difference(p_from, p_to) * p_weight;
+}
+
+static orxFLOAT orxFASTCALL get_angle(orxVECTOR& p_v) 
+{
+    return orxMath_ATan(p_v.fY, p_v.fX) - orxMATH_KF_PI_BY_2;
+}
+
 void Vacuum::OnCreate()
 {
 }
@@ -15,15 +29,38 @@ void Vacuum::OnDelete()
 
 void Vacuum::Update(const orxCLOCK_INFO &_rstInfo)
 {
-    /* Temporarily disabled while I figure out how to fix the shifting pivot */ 
-    //orxFLOAT nozzleShift = orxInput_GetValue("Right") - orxInput_GetValue("Left");
-    //SetAngularVelocity(orxCLAMP(GetAngularVelocity() + nozzleShift, -10, 10));
+    PushConfigSection();
+
+    orxVECTOR VacuumHead;
+    orxVector_Set(&VacuumHead,
+        orxInput_GetValue("Right") - orxInput_GetValue("Left"),
+        orxInput_GetValue("Down") - orxInput_GetValue("Up"),
+        orxFLOAT_0);
+
+    if (!orxVector_AreEqual(&VacuumHead, &orxVECTOR_0)) 
+    {
+        orxVector_Normalize(&VacuumHead, &VacuumHead);
+        m_DesiredRotation = get_angle(VacuumHead);
+    }
+
+    SetRotation(lerp_angle(GetRotation(), m_DesiredRotation, _rstInfo.fDT * orxConfig_GetFloat("RotationSpeed")));
+
+    {
+        orxConfig_PushSection("Runtime");
+
+        //orxConfig_SetVector("Head", &VacuumHead);
+        orxConfig_SetFloat("Head", GetRotation() * orxMATH_KF_RAD_TO_DEG);
+
+        orxConfig_PopSection();
+    }
+
+    PopConfigSection();
 }
 
 void Vacuum::OnCollide(ScrollObject* _poCollider, orxBODY_PART* _pstPart, orxBODY_PART* _pstColliderPart, const orxVECTOR& _rvPosition, const orxVECTOR& _rvNormal) 
 {
     PushConfigSection();
-    orxFLOAT vacuumStrenght = orxConfig_GetFloat("Strenght");
+    orxFLOAT vacuumStrength = orxConfig_GetFloat("Strength");
     PopConfigSection();
 
     orxVECTOR vVacuumOrigin, vColliderPosition, vDirection;
@@ -35,7 +72,7 @@ void Vacuum::OnCollide(ScrollObject* _poCollider, orxBODY_PART* _pstPart, orxBOD
 
     orxVector_Normalize(&vDirection, &vDirection);
 
-    orxVector_Mulf(&vDirection, &vDirection, vacuumStrenght);
+    orxVector_Mulf(&vDirection, &vDirection, vacuumStrength);
 
     orxObject_ApplyImpulse(_poCollider->GetOrxObject(), &vDirection, orxNULL);
 }
