@@ -4,6 +4,7 @@
  */
 
 #include "Vessel.h"
+#include "CameraBox.h"
 
 void Vessel::OnCreate()
 {
@@ -12,8 +13,11 @@ void Vessel::OnCreate()
     orxObject_GetPosition(m_Camera, &m_PreviousCameraPos);
 
     // Attach Camera to Vessel
-    orxObject_SetParent(m_Camera, GetOrxObject());
-    orxObject_SetOwner(m_Camera, GetOrxObject());
+    //orxObject_SetParent(m_Camera, GetOrxObject());
+    //orxObject_SetOwner(m_Camera, GetOrxObject());
+
+    m_CameraBox.SetCamera(m_Camera);
+    m_CameraBox.SetTarget(this);
 }
 
 void Vessel::OnDelete()
@@ -60,6 +64,8 @@ void Vessel::Update(const orxCLOCK_INFO &_rstInfo)
     {
         //orxObject_RemoveFX(m_Camera, "MiniShake");
     }
+
+    m_CameraBox.Update(_rstInfo);
 
     PopConfigSection();
 }

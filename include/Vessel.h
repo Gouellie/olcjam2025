@@ -8,6 +8,8 @@
 
 #include "olcjam2025.h"
 
+#include"CameraBox.h"
+
 /** Vessel Class
  */
 class Vessel : public ScrollObject
@@ -25,7 +27,7 @@ private:
 
                 orxVECTOR       m_PreviousCameraPos;
                 orxOBJECT*      m_Camera;
-
+                CameraBox       m_CameraBox;
 };
 
 #endif // __VESSEL_H__
