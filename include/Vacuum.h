@@ -26,6 +26,8 @@ private:
     orxFLOAT        m_DesiredRotation = orxFLOAT_0;
     orxU64          m_vacuumHeadGUID;
     orxU64          m_vacuumBeamGUID;
+
+    orxVECTOR                          m_previousMousePos;
 };
 
 class VacuumHead : public ScrollObject

@@ -21,6 +21,8 @@ static orxFLOAT orxFASTCALL get_angle(orxVECTOR& p_v)
 
 void Vacuum::OnCreate()
 {
+    orxMouse_GetPosition(&m_previousMousePos);
+
     for (orxOBJECT* pstChild = orxObject_GetOwnedChild(GetOrxObject());
         pstChild != orxNULL;
         pstChild = orxObject_GetOwnedSibling(pstChild))
@@ -41,17 +43,39 @@ void Vacuum::Update(const orxCLOCK_INFO &_rstInfo)
 {
     PushConfigSection();
 
-    orxVECTOR VacuumHead;
-    orxVector_Set(&VacuumHead,
-        orxInput_GetValue("AimRight") - orxInput_GetValue("AimLeft"),
-        orxInput_GetValue("AimDown") - orxInput_GetValue("AimUp"),
-        orxFLOAT_0);
+    orxVECTOR mousePosition;
+    orxMouse_GetPosition(&mousePosition);
 
-    if (!orxVector_AreEqual(&VacuumHead, &orxVECTOR_0)) 
+    orxVECTOR VacuumHead;
+    if (orxVector_AreEqual(&mousePosition, &m_previousMousePos)) 
     {
-        orxVector_Normalize(&VacuumHead, &VacuumHead);
-        m_DesiredRotation = get_angle(VacuumHead);
+        orxVector_Set(&VacuumHead,
+            orxInput_GetValue("AimRight") - orxInput_GetValue("AimLeft"),
+            orxInput_GetValue("AimDown") - orxInput_GetValue("AimUp"),
+            orxFLOAT_0);
     }
+    else
+    {
+        if (!orxVector_AreEqual(&VacuumHead, &orxVECTOR_0))
+        {
+            orxConfig_PushSection("Runtime");
+            orxU64 vesselGUID = orxConfig_GetU64("Vessel");
+            orxConfig_PopSection();
+
+            if (orxOBJECT* pstVessel = orxOBJECT(orxStructure_Get(vesselGUID)))
+            {
+                orxVECTOR vesselPosition, mousePositionWorld;
+                orxRender_GetWorldPosition(&mousePosition, orxNULL, &mousePositionWorld);
+                orxObject_GetPosition(pstVessel, &vesselPosition);
+                orxVector_Sub(&VacuumHead, &mousePositionWorld, &vesselPosition);
+                orxVector_Normalize(&VacuumHead, &VacuumHead);
+                m_DesiredRotation = get_angle(VacuumHead);
+            }
+
+            m_previousMousePos = mousePosition;
+        }
+    }
+
 
     SetRotation(lerp_angle(GetRotation(), m_DesiredRotation, _rstInfo.fDT * orxConfig_GetFloat("RotationSpeed")));
 
