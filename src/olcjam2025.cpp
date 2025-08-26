@@ -9,6 +9,7 @@
 
 #include "Object.h"
 #include "Vacuum.h"
+#include "VacuumBeam.h"
 #include "Vessel.h"
 #include "World.h"
 #include "orxExtensions.h"
@@ -97,6 +98,7 @@ void olcjam2025::BindObjects()
 {
   BindObject(Object);
   BindObject(Vacuum);
+  BindObject(VacuumBeam);
   BindObject(Vessel);
   BindObject(World);
 

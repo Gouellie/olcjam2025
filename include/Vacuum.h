@@ -21,12 +21,11 @@ protected:
     void            OnDelete();
     void            Update(const orxCLOCK_INFO& _rstInfo);
 
-    void            OnCollide(ScrollObject* _poCollider, orxBODY_PART* _pstPart, orxBODY_PART* _pstColliderPart, const orxVECTOR& _rvPosition, const orxVECTOR& _rvNormal);
-
-
 private:
 
     orxFLOAT        m_DesiredRotation = orxFLOAT_0;
+    orxU64          m_vacuumHeadGUID;
+    orxU64          m_vacuumBeamGUID;
 };
 
 #endif // __VACUUM_H__

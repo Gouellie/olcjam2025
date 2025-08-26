@@ -21,6 +21,7 @@ static orxFLOAT orxFASTCALL get_angle(orxVECTOR& p_v)
 
 void Vacuum::OnCreate()
 {
+    m_vacuumHeadGUID = orxStructure_GetGUID(orxObject_GetOwnedChild(GetOrxObject()));
 }
 
 void Vacuum::OnDelete()
@@ -33,8 +34,8 @@ void Vacuum::Update(const orxCLOCK_INFO &_rstInfo)
 
     orxVECTOR VacuumHead;
     orxVector_Set(&VacuumHead,
-        orxInput_GetValue("Right") - orxInput_GetValue("Left"),
-        orxInput_GetValue("Down") - orxInput_GetValue("Up"),
+        orxInput_GetValue("AimRight") - orxInput_GetValue("AimLeft"),
+        orxInput_GetValue("AimDown") - orxInput_GetValue("AimUp"),
         orxFLOAT_0);
 
     if (!orxVector_AreEqual(&VacuumHead, &orxVECTOR_0)) 
@@ -45,34 +46,28 @@ void Vacuum::Update(const orxCLOCK_INFO &_rstInfo)
 
     SetRotation(lerp_angle(GetRotation(), m_DesiredRotation, _rstInfo.fDT * orxConfig_GetFloat("RotationSpeed")));
 
+    if (orxInput_HasBeenActivated("Vacuum"))
     {
-        orxConfig_PushSection("Runtime");
-
-        //orxConfig_SetVector("Head", &VacuumHead);
-        orxConfig_SetFloat("Head", GetRotation() * orxMATH_KF_RAD_TO_DEG);
-
-        orxConfig_PopSection();
+        if (orxOBJECT* vacuumHead = orxOBJECT(orxStructure_Get(m_vacuumHeadGUID))) 
+        {
+            orxObject_SetTargetAnim(vacuumHead, "Active");
+        }
+        orxOBJECT* vacuumBeam = orxObject_CreateFromConfig("VacuumBeam");
+        orxObject_SetOwner(vacuumBeam, GetOrxObject());
+        orxObject_SetParent(vacuumBeam, GetOrxObject());
+        m_vacuumBeamGUID = orxStructure_GetGUID(vacuumBeam);
+    }
+    else if (orxInput_HasBeenDeactivated("Vacuum"))
+    {
+        if (orxOBJECT* vacuumHead = orxOBJECT(orxStructure_Get(m_vacuumHeadGUID)))
+        {
+            orxObject_SetTargetAnim(vacuumHead, "Inactive");
+        }
+        if (orxOBJECT* vacuumBeam = orxOBJECT(orxStructure_Get(m_vacuumBeamGUID)))
+        {
+            orxObject_SetLifeTime(vacuumBeam, orxFLOAT_0);
+        }
     }
 
     PopConfigSection();
-}
-
-void Vacuum::OnCollide(ScrollObject* _poCollider, orxBODY_PART* _pstPart, orxBODY_PART* _pstColliderPart, const orxVECTOR& _rvPosition, const orxVECTOR& _rvNormal) 
-{
-    PushConfigSection();
-    orxFLOAT vacuumStrength = orxConfig_GetFloat("Strength");
-    PopConfigSection();
-
-    orxVECTOR vVacuumOrigin, vColliderPosition, vDirection;
-
-    GetPosition(vVacuumOrigin, orxTRUE);
-    _poCollider->GetPosition(vColliderPosition, orxTRUE);
-
-    orxVector_Sub(&vDirection, &vVacuumOrigin, &vColliderPosition);
-
-    orxVector_Normalize(&vDirection, &vDirection);
-
-    orxVector_Mulf(&vDirection, &vDirection, vacuumStrength);
-
-    orxObject_ApplyImpulse(_poCollider->GetOrxObject(), &vDirection, orxNULL);
 }
