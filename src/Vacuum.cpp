@@ -21,7 +21,16 @@ static orxFLOAT orxFASTCALL get_angle(orxVECTOR& p_v)
 
 void Vacuum::OnCreate()
 {
-    m_vacuumHeadGUID = orxStructure_GetGUID(orxObject_GetOwnedChild(GetOrxObject()));
+    for (orxOBJECT* pstChild = orxObject_GetOwnedChild(GetOrxObject());
+        pstChild != orxNULL;
+        pstChild = orxObject_GetOwnedSibling(pstChild))
+    {
+        if (orxString_Compare(orxObject_GetName(pstChild), "VacuumHead") == 0)
+        {
+            m_vacuumHeadGUID = orxStructure_GetGUID(pstChild);
+            break;
+        }
+    }
 }
 
 void Vacuum::OnDelete()
@@ -70,4 +79,24 @@ void Vacuum::Update(const orxCLOCK_INFO &_rstInfo)
     }
 
     PopConfigSection();
+}
+
+void VacuumHead::OnCreate()
+{
+}
+
+void VacuumHead::OnDelete()
+{
+}
+
+void VacuumHead::Update(const orxCLOCK_INFO& _rstInfo)
+{
+}
+
+void VacuumHead::OnCollide(ScrollObject* _poCollider, orxBODY_PART* _pstPart, orxBODY_PART* _pstColliderPart, const orxVECTOR& _rvPosition, const orxVECTOR& _rvNormal)
+{
+    if (orxInput_IsActive("Vacuum")) 
+    {
+        _poCollider->SetLifeTime(0);
+    }
 }

@@ -43,8 +43,6 @@ void VacuumBeam::Update(const orxCLOCK_INFO &_rstInfo)
 void VacuumBeam::OnCollide(ScrollObject* _poCollider, orxBODY_PART* _pstPart, orxBODY_PART* _pstColliderPart, const orxVECTOR& _rvPosition, const orxVECTOR& _rvNormal)
 {
    m_collidingIDs.push_back(orxStructure_GetGUID(_poCollider->GetOrxObject()));
-
-
 }
 
 void VacuumBeam::OnSeparate(ScrollObject* _poCollider, orxBODY_PART* _pstPart, orxBODY_PART* _pstColliderPart) 

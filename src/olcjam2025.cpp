@@ -98,6 +98,7 @@ void olcjam2025::BindObjects()
 {
   BindObject(Object);
   BindObject(Vacuum);
+  BindObject(VacuumHead);
   BindObject(VacuumBeam);
   BindObject(Vessel);
   BindObject(World);

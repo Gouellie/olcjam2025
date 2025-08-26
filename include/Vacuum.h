@@ -28,4 +28,20 @@ private:
     orxU64          m_vacuumBeamGUID;
 };
 
+class VacuumHead : public ScrollObject
+{
+public:
+
+
+protected:
+
+    void            OnCreate();
+    void            OnDelete();
+    void            Update(const orxCLOCK_INFO& _rstInfo);
+    void            OnCollide(ScrollObject* _poCollider, orxBODY_PART* _pstPart, orxBODY_PART* _pstColliderPart, const orxVECTOR& _rvPosition, const orxVECTOR& _rvNormal);
+
+private:
+
+};
+
 #endif // __VACUUM_H__
