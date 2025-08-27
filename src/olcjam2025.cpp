@@ -8,10 +8,10 @@
 #undef __SCROLL_IMPL__
 
 #include "Object.h"
+#include "LoadingGrid.h"
 #include "Vacuum.h"
 #include "VacuumBeam.h"
 #include "Vessel.h"
-#include "World.h"
 #include "orxExtensions.h"
 
 #ifdef __orxMSVC__
@@ -21,6 +21,20 @@ __declspec(dllexport) unsigned long NvOptimusEnablement        = 1;
 __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 
 #endif // __orxMSVC__
+
+static orxSTRINGID CellStringID;
+
+static orxSTATUS orxFASTCALL EventHandler(const orxEVENT* _pstEvent)
+{
+    orxSTRUCTURE* pstSender = orxStructure_GetOwner(_pstEvent->hSender);
+    if (orxObject_GetGroupID(orxOBJECT(pstSender)) == CellStringID)
+    {
+        // Sets cell as spawned object's owner
+        orxObject_SetOwner(orxOBJECT(_pstEvent->hRecipient), pstSender);
+    }
+
+    return orxSTATUS_SUCCESS;
+}
 
 /** Update function, it has been registered to be called every tick of the core clock
  */
@@ -67,6 +81,12 @@ orxSTATUS olcjam2025::Init()
     orxViewport_CreateFromConfig(orxConfig_GetListString("ViewportList", i));
   }
 
+  CellStringID = orxString_GetID("Cell");
+
+  // Register event handler to set the cell as owner of spawned objects
+  orxEvent_AddHandler(orxEVENT_TYPE_SPAWNER, &EventHandler);
+  orxEvent_SetHandlerIDFlags(&EventHandler, orxEVENT_TYPE_SPAWNER, orxNULL, orxEVENT_GET_FLAG(orxSPAWNER_EVENT_SPAWN), orxEVENT_KU32_MASK_ID_ALL);
+
   // Create the scene
   CreateObject("Startup");
 
@@ -97,12 +117,11 @@ void olcjam2025::Exit()
 void olcjam2025::BindObjects()
 {
   BindObject(Object);
+  BindObject(LoadingGrid);
   BindObject(Vacuum);
   BindObject(VacuumHead);
   BindObject(VacuumBeam);
   BindObject(Vessel);
-  BindObject(World);
-
   BindObject(orxContainerObject);
 }
 

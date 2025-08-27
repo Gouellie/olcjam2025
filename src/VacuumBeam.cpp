@@ -34,11 +34,11 @@ void VacuumBeam::Update(const orxCLOCK_INFO &_rstInfo)
             orxVector_Sub(&vDirection, &vVacuumOrigin, &vColliderPosition);
 
             const orxFLOAT distanceToOrigin = orxVector_GetDistance(&vVacuumOrigin, &vColliderPosition);
-            const orxFLOAT strenghtMult = orxMath_Pow(2, orxREMAP(orxFLOAT_0, vSize.fY * 1.1f, vaccumDistanceMult, orxFLOAT_1, orxCLAMP(distanceToOrigin, orxFLOAT_0, vSize.fY)));
+            const orxFLOAT strengthMultiplier = orxMath_Pow(2, orxREMAP(orxFLOAT_0, vSize.fY, vaccumDistanceMult, orxFLOAT_1, orxCLAMP(distanceToOrigin, orxFLOAT_0, vSize.fY)));
 
             orxVector_Normalize(&vDirection, &vDirection);
 
-            orxVector_Mulf(&vDirection, &vDirection, vacuumStrength * strenghtMult * _rstInfo.fDT);
+            orxVector_Mulf(&vDirection, &vDirection, vacuumStrength * strengthMultiplier * _rstInfo.fDT);
 
             orxObject_ApplyForce(collider, &vDirection, orxNULL);
         }
