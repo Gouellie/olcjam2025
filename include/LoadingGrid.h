@@ -26,7 +26,7 @@ private:
                 orxFLOAT        m_CellSize;
                 orxS32          m_LoadingRange;
                  
-                const orxSTRING m_CellSpawner;
+                const orxSTRING m_CellType;
 
                 orxVECTOR       m_PreviousPlayerPos;
 };

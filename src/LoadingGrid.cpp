@@ -9,6 +9,7 @@ void LoadingGrid::OnCreate()
 {
     PushConfigSection(orxTRUE);
 
+
     // The String is evaluated and the command is executed. 
     // This set's an arbitrary offset that the spawned Objects uses
     orxConfig_GetString("SetBasePosition");
@@ -16,7 +17,7 @@ void LoadingGrid::OnCreate()
     m_CellTable = orxHashTable_Create(8192, orxHASHTABLE_KU32_FLAG_NONE, orxMEMORY_TYPE_MAIN);
     m_CellSize = orxConfig_GetFloat("CellSize");
     m_LoadingRange = orxConfig_GetS32("LoadingRange");
-    m_CellSpawner = orxConfig_GetString("CellSpawner");
+    m_CellType = orxConfig_GetString("CellType");
 
     PopConfigSection();
 }
@@ -30,10 +31,6 @@ void LoadingGrid::Update(const orxCLOCK_INFO &_rstInfo)
 {
     orxConfig_PushSection("Runtime");
     orxU64 vesselGUID = orxConfig_GetU64("Vessel");
-    orxConfig_PopSection();
-
-    orxConfig_PushSection("Cell");
-    orxConfig_SetString("Spawner", m_CellSpawner);
     orxConfig_PopSection();
 
     orxVECTOR PlayerPos;
@@ -67,7 +64,7 @@ void LoadingGrid::Update(const orxCLOCK_INFO &_rstInfo)
             {
                 // Create new node
                 orxVECTOR Pos;
-                Cell = orxObject_CreateFromConfig("Cell");
+                Cell = orxObject_CreateFromConfig(m_CellType);
 
                 orxObject_SetParent(Cell, GetOrxObject());
                 orxObject_SetOwner(Cell, GetOrxObject());
