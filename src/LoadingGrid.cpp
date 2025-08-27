@@ -9,7 +9,6 @@ void LoadingGrid::OnCreate()
 {
     PushConfigSection(orxTRUE);
 
-
     // The String is evaluated and the command is executed. 
     // This set's an arbitrary offset that the spawned Objects uses
     orxConfig_GetString("SetBasePosition");
@@ -18,6 +17,10 @@ void LoadingGrid::OnCreate()
     m_CellSize = orxConfig_GetFloat("CellSize");
     m_LoadingRange = orxConfig_GetS32("LoadingRange");
     m_CellType = orxConfig_GetString("CellType");
+
+    orxConfig_PushSection("Runtime");
+    orxConfig_SetU64(GetName(), GetGUID());
+    orxConfig_PopSection();
 
     PopConfigSection();
 }
@@ -99,4 +102,29 @@ void LoadingGrid::Update(const orxCLOCK_INFO &_rstInfo)
 
     // Update previous player position
     orxVector_Copy(&m_PreviousPlayerPos, &PlayerPos);
+}
+
+const orxOBJECT* LoadingGrid::GetCellAtPosition(const orxVECTOR& position) const
+{
+    orxVECTOR CellPos;
+    orxVector_Round(&CellPos, orxVector_Divf(&CellPos, &position, m_CellSize));
+
+    orxS32 x = orxF2S(CellPos.fX), y = orxF2S(CellPos.fY);
+    orxU64 CellID = ((orxU64)x << 32) | (orxU32)y;
+    orxOBJECT* Cell = (orxOBJECT*)orxHashTable_Get(m_CellTable, CellID);
+
+    if (!Cell)
+    {
+        // Create new node
+        orxVECTOR Pos;
+        Cell = orxObject_CreateFromConfig(m_CellType);
+
+        orxObject_SetParent(Cell, GetOrxObject());
+        orxObject_SetOwner(Cell, GetOrxObject());
+        orxObject_SetPosition(Cell, orxVector_Set(&Pos, m_CellSize * orxS2F(x), m_CellSize * orxS2F(y), orxFLOAT_0));
+
+        orxHashTable_Add(m_CellTable, CellID, (void*)Cell);
+    }
+
+    return Cell;
 }
