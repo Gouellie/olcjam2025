@@ -18,22 +18,27 @@ void VacuumBeam::Update(const orxCLOCK_INFO &_rstInfo)
 {
     PushConfigSection();
     orxFLOAT vacuumStrength = orxConfig_GetFloat("Strength");
+    orxFLOAT vaccumDistanceMult = orxConfig_GetFloat("DistanceMult");
     PopConfigSection();
 
     for (auto iter = m_collidingIDs.begin(); iter != m_collidingIDs.end(); iter++)
     {
         if (orxOBJECT* collider = orxOBJECT(orxStructure_Get(*iter))) 
         {
-            orxVECTOR vVacuumOrigin, vColliderPosition, vDirection;
+            orxVECTOR vVacuumOrigin, vColliderPosition, vDirection, vSize;
 
+            GetSize(vSize);
             GetPosition(vVacuumOrigin, orxTRUE);
             orxObject_GetPosition(collider, &vColliderPosition);
 
             orxVector_Sub(&vDirection, &vVacuumOrigin, &vColliderPosition);
 
+            const orxFLOAT distanceToOrigin = orxVector_GetDistance(&vVacuumOrigin, &vColliderPosition);
+            const orxFLOAT strenghtMult = orxMath_Pow(2, orxREMAP(orxFLOAT_0, vSize.fY * 1.1f, vaccumDistanceMult, orxFLOAT_1, orxCLAMP(distanceToOrigin, orxFLOAT_0, vSize.fY)));
+
             orxVector_Normalize(&vDirection, &vDirection);
 
-            orxVector_Mulf(&vDirection, &vDirection, vacuumStrength);
+            orxVector_Mulf(&vDirection, &vDirection, vacuumStrength * strenghtMult * _rstInfo.fDT);
 
             orxObject_ApplyForce(collider, &vDirection, orxNULL);
         }

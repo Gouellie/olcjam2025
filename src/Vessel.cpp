@@ -14,7 +14,9 @@ void Vessel::OnCreate()
 
     // Attach Camera to Vessel
     //orxObject_SetParent(m_Camera, GetOrxObject());
-    //orxObject_SetOwner(m_Camera, GetOrxObject());
+
+    // Required so that the Camera is moving in local space
+    orxObject_SetOwner(m_Camera, GetOrxObject());
 
     m_CameraBox.SetCamera(m_Camera);
     m_CameraBox.SetTarget(this);
