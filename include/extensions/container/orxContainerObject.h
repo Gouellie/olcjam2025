@@ -70,8 +70,8 @@ protected:
 
 private:
 
-                orxCONTAINER_TYPE             m_eContainerType;
-                orxCONTAINER_ORIENTATION      m_eContainerOrientation;
+                orxCONTAINER_TYPE             m_eContainerType            = orxCONTAINER_TYPE_STACK_PANEL;
+                orxCONTAINER_ORIENTATION      m_eContainerOrientation     = orxCONTAINER_ORIENTATION_VERTICAL;
 
                 orxS32                        m_s32Spacing                = orxS32(0);
                 orxCONTAINER_MARGIN           m_stMargin                  = {};

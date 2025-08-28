@@ -259,8 +259,11 @@ static orxSTATUS orxFASTCALL orxContainer_EventHandler(const orxEVENT *_pstEvent
       /* Still valid? */
       if (poContainerObject != orxNULL)
       {
-        listSorted[listSize] = poContainerObject->GetOrxObject();
-        listSize++;
+          if (poContainerObject->IsEnabled()) 
+          {
+              listSorted[listSize] = poContainerObject->GetOrxObject();
+              listSize++;
+          }
       }
     }
 

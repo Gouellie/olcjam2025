@@ -52,7 +52,7 @@ void Vacuum::Update(const orxCLOCK_INFO &_rstInfo)
         if (orxOBJECT* pstVessel = orxOBJECT(orxStructure_Get(olcjam2025::GetInstance().GetActiveVesselID())))
         {
             orxVECTOR vesselPosition, mousePositionWorld;
-            orxRender_GetWorldPosition(&mousePosition, orxNULL, &mousePositionWorld);
+            orxRender_GetWorldPosition(&mousePosition, orxViewport_Get("MainViewport"), &mousePositionWorld);
             orxObject_GetWorldPosition(pstVessel, &vesselPosition);
             orxVector_Sub(&VacuumHead, &mousePositionWorld, &vesselPosition);
             m_DesiredRotation = get_angle(VacuumHead);
