@@ -14,13 +14,6 @@ void CameraBox::Update(const orxCLOCK_INFO& _rstInfo)
     orxConfig_PushSection("CameraBox");
 	// Special case for "mining" activity
 
-	// Check if player is outside of bounds
-
-
-	// Set target position based on where player is
-
-	// Lerp Camera towards target position
-
     orxVECTOR delta = orxVECTOR_0;
 
     //X Axis
@@ -52,20 +45,57 @@ void CameraBox::Update(const orxCLOCK_INFO& _rstInfo)
     {
         const orxFLOAT boundTop = orxConfig_GetFloat("BoundTop");
         if (orxMath_Abs(dy) > boundTop)
+        {
             delta.fY = orxMath_Abs(dy) - boundTop;
+        }
     }
     else
     {
         const orxFLOAT boundBottom = orxConfig_GetFloat("BoundBottom");
         if (orxMath_Abs(dy) > boundBottom)
+        {
             delta.fY = -(orxMath_Abs(dy) - boundBottom);
+        }
     }
 
     //Move the camera and smoothing
     m_DesiredPos = *orxVector_Add(&m_DesiredPos, &m_TargetLock, &delta);
+
+    if (GetBeamActive())
+    {
+        m_BeamFacing = orxVECTOR_Y;
+        orxVector_2DRotate(&m_BeamFacing, &m_BeamFacing, GetBeamPosition());
+        m_BeamFacing = *orxVector_Mulf(&m_BeamFacing, &m_BeamFacing, GetBeamLength() * orxConfig_GetFloat("FacingRatio"));
+        m_DesiredPos = *orxVector_Add(&m_DesiredPos, &m_DesiredPos, &m_BeamFacing);
+    }
+
     m_TargetLock = m_DesiredPos;
     orxVECTOR pos = *orxVector_Lerp(&pos, &cameraPrevPos, &m_DesiredPos, orxConfig_GetFloat("LerpSpeed") * _rstInfo.fDT);
     orxObject_SetPosition(m_Camera, &pos);
 
     orxConfig_PopSection();
+}
+
+orxBOOL CameraBox::GetBeamActive()
+{
+    return orxInput_IsActive("Vacuum");
+}
+
+orxFLOAT CameraBox::GetBeamPosition()
+{
+    if (orxOBJECT* vacuum = orxOBJECT(orxStructure_Get(m_VacuumGUID)))
+    {
+        return orxObject_GetRotation(vacuum);
+    }
+
+    return orxFLOAT_0;
+}
+
+orxFLOAT CameraBox::GetBeamLength()
+{
+    orxVECTOR beamSize = orxVECTOR_0;
+    orxConfig_PushSection("VacuumBeam");
+    beamSize = *orxConfig_GetVector("Size", &beamSize);
+    orxConfig_PopSection();
+    return beamSize.fY;
 }

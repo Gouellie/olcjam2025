@@ -12,14 +12,22 @@ void Vessel::OnCreate()
     m_Camera = orxObject_CreateFromConfig("Camera");
     orxObject_GetPosition(m_Camera, &m_PreviousCameraPos);
 
-    // Attach Camera to Vessel
-    //orxObject_SetParent(m_Camera, GetOrxObject());
-
     // Required so that the Camera is moving in local space
     orxObject_SetOwner(m_Camera, GetOrxObject());
 
     m_CameraBox.SetCamera(m_Camera);
     m_CameraBox.SetTarget(this);
+
+    for (orxOBJECT* pstChild = orxObject_GetOwnedChild(GetOrxObject());
+        pstChild != orxNULL;
+        pstChild = orxObject_GetOwnedSibling(pstChild))
+    {
+        if (orxString_Compare(orxObject_GetName(pstChild), "Vacuum") == 0)
+        {
+            m_CameraBox.SetVacuumID(orxStructure_GetGUID(pstChild));
+            break;
+        }
+    }
 }
 
 void Vessel::OnDelete()
