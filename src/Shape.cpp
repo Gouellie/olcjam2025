@@ -24,7 +24,7 @@ void Shape::Update(const orxCLOCK_INFO &_rstInfo)
     {
         orxVECTOR vScale;
         orxFLOAT speed = orxVector_GetSize(&vSpeed);
-        orxFLOAT scale = orxREMAP(orxFLOAT_0, orxFLOAT_1, m_vOriginalScale.fX, m_vOriginalScale.fX * 0.6, orxMath_SmootherStep(80, 3000, speed));
+        orxFLOAT scale = orxREMAP(orxFLOAT_0, orxFLOAT_1, m_vOriginalScale.fX, m_vOriginalScale.fX * 0.6f, orxMath_SmootherStep(80.f, 3000.f, speed));
         orxVector_Set(&vScale, scale, scale, 1.0f);
         SetScale(vScale);
 
