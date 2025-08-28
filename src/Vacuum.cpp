@@ -34,7 +34,7 @@ void Vacuum::Update(const orxCLOCK_INFO &_rstInfo)
     orxMouse_GetPosition(&mousePosition);
 
     orxVECTOR VacuumHead;
-    if (orxVector_AreEqual(&mousePosition, &m_previousMousePos)) 
+    if (olcjam2025::GetInstance().GetIsUsingPad())
     {
         orxVector_Set(&VacuumHead,
             orxInput_GetValue("AimRight") - orxInput_GetValue("AimLeft"),
@@ -49,11 +49,7 @@ void Vacuum::Update(const orxCLOCK_INFO &_rstInfo)
     }
     else
     {
-        orxConfig_PushSection("Runtime");
-        orxU64 vesselGUID = orxConfig_GetU64("Vessel");
-        orxConfig_PopSection();
-
-        if (orxOBJECT* pstVessel = orxOBJECT(orxStructure_Get(vesselGUID)))
+        if (orxOBJECT* pstVessel = orxOBJECT(orxStructure_Get(olcjam2025::GetInstance().GetActiveVesselID())))
         {
             orxVECTOR vesselPosition, mousePositionWorld;
             orxRender_GetWorldPosition(&mousePosition, orxNULL, &mousePositionWorld);

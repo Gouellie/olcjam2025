@@ -14,6 +14,10 @@ class olcjam2025 : public Scroll<olcjam2025>
 {
 public:
 
+                orxU64          GetActiveVesselID() const { return m_ActiveVesselID; }
+                void            SetActiveVesselID(const orxU64 activeVesselID) { m_ActiveVesselID = activeVesselID; }
+                orxBOOL         GetIsUsingPad() const { return m_bIsUsingPad; }
+                void            SetIsUsingPad(const orxBOOL isUsingPad) { m_bIsUsingPad = isUsingPad; }
 
 private:
 
@@ -29,6 +33,9 @@ private:
 
 
 private:
+                
+                orxU64          m_ActiveVesselID;
+                orxBOOL         m_bIsUsingPad;
 };
 
 #endif // __olcjam2025_H__

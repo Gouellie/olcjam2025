@@ -8,6 +8,8 @@
 
 void Vessel::OnCreate()
 {
+    olcjam2025::GetInstance().SetActiveVesselID(GetGUID());
+
     // Init the camera
     m_Camera = orxObject_CreateFromConfig("Camera");
     orxObject_GetPosition(m_Camera, &m_PreviousCameraPos);

@@ -37,6 +37,23 @@ static orxSTATUS orxFASTCALL EventHandler(const orxEVENT* _pstEvent)
     return orxSTATUS_SUCCESS;
 }
 
+static orxSTATUS orxFASTCALL InputEventHandler(const orxEVENT* _pstEvent) 
+{
+    orxINPUT_EVENT_PAYLOAD* inputPayload = (orxINPUT_EVENT_PAYLOAD*)_pstEvent->pstPayload;
+    orxINPUT_TYPE inputType = inputPayload->aeType[0];
+
+    if (inputType == orxINPUT_TYPE::orxINPUT_TYPE_MOUSE_BUTTON || inputType == orxINPUT_TYPE::orxINPUT_TYPE_MOUSE_AXIS) 
+    {
+        olcjam2025::GetInstance().SetIsUsingPad(orxFALSE);
+    }
+    else if (inputType == orxINPUT_TYPE::orxINPUT_TYPE_JOYSTICK_BUTTON || inputType == orxINPUT_TYPE::orxINPUT_TYPE_JOYSTICK_AXIS)
+    {
+        olcjam2025::GetInstance().SetIsUsingPad(orxTRUE);
+    }
+
+    return orxSTATUS_SUCCESS;
+}
+
 /** Update function, it has been registered to be called every tick of the core clock
  */
 void olcjam2025::Update(const orxCLOCK_INFO &_rstClockInfo)
@@ -87,6 +104,9 @@ orxSTATUS olcjam2025::Init()
   // Register event handler to set the cell as owner of spawned objects
   orxEvent_AddHandler(orxEVENT_TYPE_SPAWNER, &EventHandler);
   orxEvent_SetHandlerIDFlags(&EventHandler, orxEVENT_TYPE_SPAWNER, orxNULL, orxEVENT_GET_FLAG(orxSPAWNER_EVENT_SPAWN), orxEVENT_KU32_MASK_ID_ALL);
+
+  // Input Handler to detect PadInput / MouseInput
+  orxEvent_AddHandler(orxEVENT_TYPE_INPUT, InputEventHandler);
 
   // Create the scene
   CreateObject("Startup");

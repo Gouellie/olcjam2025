@@ -1,6 +1,6 @@
 #pragma once
 
-#include "olcjam2025.h"
+#include "orx.h"
 
 static orxFLOAT orxFASTCALL angle_difference(orxFLOAT p_from, orxFLOAT p_to) {
     orxFLOAT difference = orxMath_Mod(p_to - p_from, orxMATH_KF_2_PI);
