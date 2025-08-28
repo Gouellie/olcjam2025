@@ -103,12 +103,13 @@ void VacuumHead::OnCollide(ScrollObject* _poCollider, orxBODY_PART* _pstPart, or
 {
     if (orxInput_IsActive("Vacuum")) 
     {
-        orxLOG(_poCollider->GetName());
         orxConfig_PushSection("Tally");
         orxS32 tally = orxConfig_GetS32(_poCollider->GetName());
         orxConfig_SetS32(_poCollider->GetName(), tally + 1);
         orxConfig_PopSection();
+
         AddFX("VacuumBlowFX");
+
         _poCollider->SetLifeTime(0);
     }
 }
