@@ -235,6 +235,12 @@ static orxSTATUS orxFASTCALL orxContainer_EventHandler(const orxEVENT *_pstEvent
   /* Checks */
   orxASSERT(_pstEvent->eType == orxEVENT_TYPE_RENDER);
 
+  if (sstObject.pstContainerBank == orxNULL) 
+  {
+      eResult = orxSTATUS_FAILURE;
+      return eResult;
+  }
+
   /* End of rendering? */
   if(_pstEvent->eID == orxRENDER_EVENT_STOP)
   {
@@ -316,6 +322,7 @@ void orxContainer_Exit()
 
   /* Deletes banks */
    orxBank_Delete(sstObject.pstContainerBank);
+   sstObject.pstContainerBank = orxNULL;
 
   // Done!
   return;

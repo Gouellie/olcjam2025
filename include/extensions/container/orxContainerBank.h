@@ -33,6 +33,10 @@ static orxCONTAINER_STATIC sstObject;
 orxSTATUS orxContainerBank_RegisterContainer(orxOBJECT* _pstObject)
 {
   orxSTATUS eResult = orxSTATUS_FAILURE;
+  if (sstObject.pstContainerBank == orxNULL)
+  {
+      return eResult;
+  }
 
   // Valid?
   if (_pstObject != orxNULL)
@@ -54,6 +58,11 @@ orxSTATUS orxContainerBank_RegisterContainer(orxOBJECT* _pstObject)
 orxSTATUS orxContainerBank_UnregisterContainer(orxOBJECT* _pstObject)
 {
   orxSTATUS eResult = orxSTATUS_FAILURE;
+  if (sstObject.pstContainerBank == orxNULL)
+  {
+      return eResult;
+  }
+
   if (_pstObject != orxNULL) 
   {
       orxU64 objectID = orxStructure_GetGUID(_pstObject);
