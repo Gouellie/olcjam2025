@@ -24,6 +24,7 @@ protected:
 private:
 
     orxFLOAT        m_DesiredRotation = orxFLOAT_0;
+    orxFLOAT        m_RotationSpeed;
     orxU64          m_vacuumHeadGUID;
     orxU64          m_vacuumBeamGUID;
 

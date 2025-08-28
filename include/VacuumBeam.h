@@ -27,6 +27,8 @@ protected:
 private:
 
                 std::vector<orxU64>                m_collidingIDs;
+                orxFLOAT                           m_vacuumStrength;
+                orxFLOAT                           m_vacuumDistanceMultiplier;
 };
 
 #endif // __VACUUM_BEAM_H__

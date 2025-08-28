@@ -32,14 +32,9 @@ void LoadingGrid::OnDelete()
 
 void LoadingGrid::Update(const orxCLOCK_INFO &_rstInfo)
 {
-    orxConfig_PushSection("Runtime");
-    orxU64 vesselGUID = orxConfig_GetU64("Vessel");
-    orxConfig_PopSection();
-
     orxVECTOR PlayerPos;
-
     orxOBJECT* pstVessel;
-    if (pstVessel = orxOBJECT(orxStructure_Get(vesselGUID)))
+    if (pstVessel = orxOBJECT(orxStructure_Get(olcjam2025::GetInstance().GetActiveVesselID())))
     {
         orxObject_GetPosition(pstVessel, &PlayerPos);
     }

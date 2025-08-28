@@ -93,6 +93,17 @@ orxSTATUS olcjam2025::Init()
   // Push [Main] as the default config section
   orxConfig_PushSection("Main");
 
+  // creating temp instances of each object types to force load their resources
+  orxS32 preloadCount = orxConfig_GetListCount("PreloadList");
+  for (orxS32 i = 0; i < preloadCount; i++) 
+  {
+      orxOBJECT* pstObject = orxObject_CreateFromConfig(orxConfig_GetListString("PreloadList", i));
+      if (pstObject != orxNULL) 
+      {
+          orxObject_SetLifeTime(pstObject, 0);
+      }
+  }
+
   // Create the viewports
   for(orxS32 i = 0, iCount = orxConfig_GetListCount("ViewportList"); i < iCount; i++)
   {
@@ -110,6 +121,9 @@ orxSTATUS olcjam2025::Init()
 
   // Create the scene
   CreateObject("Startup");
+
+  // Skip Typo check in debug, dramatically speeds up the Debug Version
+  orxConfig_EnableTypoCheck(orxFALSE);
 
   // Done!
   return orxSTATUS_SUCCESS;

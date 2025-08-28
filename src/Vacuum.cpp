@@ -8,6 +8,8 @@
 
 void Vacuum::OnCreate()
 {
+    m_RotationSpeed = orxConfig_GetFloat("RotationSpeed");
+
     orxMouse_GetPosition(&m_previousMousePos);
 
     for (orxOBJECT* pstChild = orxObject_GetOwnedChild(GetOrxObject());
@@ -28,8 +30,6 @@ void Vacuum::OnDelete()
 
 void Vacuum::Update(const orxCLOCK_INFO &_rstInfo)
 {
-    PushConfigSection();
-
     orxVECTOR mousePosition;
     orxMouse_GetPosition(&mousePosition);
 
@@ -53,16 +53,15 @@ void Vacuum::Update(const orxCLOCK_INFO &_rstInfo)
         {
             orxVECTOR vesselPosition, mousePositionWorld;
             orxRender_GetWorldPosition(&mousePosition, orxNULL, &mousePositionWorld);
-            orxObject_GetPosition(pstVessel, &vesselPosition);
+            orxObject_GetWorldPosition(pstVessel, &vesselPosition);
             orxVector_Sub(&VacuumHead, &mousePositionWorld, &vesselPosition);
-            orxVector_Normalize(&VacuumHead, &VacuumHead);
             m_DesiredRotation = get_angle(VacuumHead);
         }
 
         m_previousMousePos = mousePosition;
     }
 
-    SetRotation(lerp_angle(GetRotation(), m_DesiredRotation, _rstInfo.fDT * orxConfig_GetFloat("RotationSpeed")));
+    SetRotation(lerp_angle(GetRotation(), m_DesiredRotation, _rstInfo.fDT * m_RotationSpeed));
 
     if (orxInput_HasBeenActivated("Vacuum"))
     {
@@ -86,8 +85,6 @@ void Vacuum::Update(const orxCLOCK_INFO &_rstInfo)
             orxObject_SetLifeTime(vacuumBeam, orxFLOAT_0);
         }
     }
-
-    PopConfigSection();
 }
 
 void VacuumHead::OnCreate()
@@ -106,6 +103,7 @@ void VacuumHead::OnCollide(ScrollObject* _poCollider, orxBODY_PART* _pstPart, or
 {
     if (orxInput_IsActive("Vacuum")) 
     {
+        AddFX("VacuumBlowFX");
         _poCollider->SetLifeTime(0);
     }
 }

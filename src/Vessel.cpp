@@ -30,6 +30,9 @@ void Vessel::OnCreate()
             break;
         }
     }
+
+    orxConfig_GetListVector("MovingSpeed", 0, &m_vPlayerSpeed);
+    orxConfig_GetListVector("MovingSpeed", 1, &m_vPlayerHighSpeed);
 }
 
 void Vessel::OnDelete()
@@ -38,20 +41,15 @@ void Vessel::OnDelete()
 
 void Vessel::Update(const orxCLOCK_INFO &_rstInfo)
 {
-    PushConfigSection();
-
     // Update player (and camera) position
-    orxVECTOR PlayerMove, PlayerSpeed, PlayerHighSpeed, PlayerPos;
+    orxVECTOR PlayerMove, PlayerPos, PlayerSpeed;
     orxVector_Mulf(&PlayerMove,
         orxVector_Mul(&PlayerMove,
             orxVector_Set(&PlayerMove,
                 orxInput_GetValue("Right") - orxInput_GetValue("Left"),
                 orxInput_GetValue("Down") - orxInput_GetValue("Up"),
                 orxFLOAT_0),
-            orxVector_Lerp(&PlayerSpeed,
-                orxConfig_GetListVector("MovingSpeed", 0, &PlayerSpeed),
-                orxConfig_GetListVector("MovingSpeed", 1, &PlayerHighSpeed),
-                orxInput_GetValue("Fast"))),
+            orxVector_Lerp(&PlayerSpeed, &m_vPlayerSpeed, &m_vPlayerHighSpeed, orxInput_GetValue("Fast"))),
         _rstInfo.fDT);
     orxObject_SetPosition(GetOrxObject(), orxVector_Add(&PlayerPos,
         orxObject_GetPosition(GetOrxObject(), &PlayerPos),
@@ -98,6 +96,4 @@ void Vessel::Update(const orxCLOCK_INFO &_rstInfo)
     }
 
     m_CameraBox.Update(_rstInfo);
-
-    PopConfigSection();
 }

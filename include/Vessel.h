@@ -28,6 +28,9 @@ private:
                 orxVECTOR       m_PreviousCameraPos;
                 orxOBJECT*      m_Camera;
                 CameraBox       m_CameraBox;
+
+                orxVECTOR       m_vPlayerSpeed;
+                orxVECTOR       m_vPlayerHighSpeed;
 };
 
 #endif // __VESSEL_H__

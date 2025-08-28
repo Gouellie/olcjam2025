@@ -8,6 +8,8 @@
 void VacuumBeam::OnCreate()
 {
     m_collidingIDs.reserve(10);
+    m_vacuumStrength = orxConfig_GetFloat("Strength");
+    m_vacuumDistanceMultiplier = orxConfig_GetFloat("DistanceMult");
 }
 
 void VacuumBeam::OnDelete()
@@ -16,11 +18,6 @@ void VacuumBeam::OnDelete()
 
 void VacuumBeam::Update(const orxCLOCK_INFO &_rstInfo)
 {
-    PushConfigSection();
-    orxFLOAT vacuumStrength = orxConfig_GetFloat("Strength");
-    orxFLOAT vaccumDistanceMult = orxConfig_GetFloat("DistanceMult");
-    PopConfigSection();
-
     for (auto iter = m_collidingIDs.begin(); iter != m_collidingIDs.end(); iter++)
     {
         if (orxOBJECT* collider = orxOBJECT(orxStructure_Get(*iter))) 
@@ -35,11 +32,11 @@ void VacuumBeam::Update(const orxCLOCK_INFO &_rstInfo)
 
             const orxFLOAT distanceToOrigin = orxVector_GetDistance(&vVacuumOrigin, &vColliderPosition);
 
-            const orxFLOAT strengthMultiplier = orxMath_Pow(2, orxREMAP(orxFLOAT_0, orxFLOAT_1, vaccumDistanceMult, orxFLOAT_1, orxMath_SmootherStep(vSize.fY / 2.0f, vSize.fY * 3.0f, distanceToOrigin)));
+            const orxFLOAT strengthMultiplier = orxMath_Pow(2, orxREMAP(orxFLOAT_0, orxFLOAT_1, m_vacuumDistanceMultiplier, orxFLOAT_1, orxMath_SmootherStep(vSize.fY / 2.0f, vSize.fY * 3.0f, distanceToOrigin)));
 
             orxVector_Normalize(&vDirection, &vDirection);
 
-            orxVector_Mulf(&vDirection, &vDirection, vacuumStrength * strengthMultiplier * _rstInfo.fDT);
+            orxVector_Mulf(&vDirection, &vDirection, m_vacuumStrength * strengthMultiplier * _rstInfo.fDT);
 
             orxObject_ApplyForce(collider, &vDirection, orxNULL);
         }
