@@ -7,3 +7,4 @@ bin/imgui.ini
 *.cih
 *.obr
 /.vscode
+/data/texture/tmp
