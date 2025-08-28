@@ -14,6 +14,9 @@ class LoadingGrid : public ScrollObject
 {
 public:
 
+                const orxOBJECT*    GetCellAtPosition(const orxVECTOR& position) const;
+                const orxFLOAT      GetCellSize() const { return m_CellSize; }
+
 protected:
 
                 void            OnCreate();
