@@ -104,12 +104,18 @@ void LoadingGrid::Update(const orxCLOCK_INFO &_rstInfo)
     orxVector_Copy(&m_PreviousPlayerPos, &PlayerPos);
 }
 
-const orxOBJECT* LoadingGrid::GetCellAtPosition(const orxVECTOR& position) const
+orxOBJECT* LoadingGrid::GetCellAtPosition(const orxVECTOR& position) const
 {
     orxVECTOR CellPos;
     orxVector_Round(&CellPos, orxVector_Divf(&CellPos, &position, m_CellSize));
 
     orxS32 x = orxF2S(CellPos.fX), y = orxF2S(CellPos.fY);
+
+    return GetCellAtCoordinates(x, y);
+}
+
+orxOBJECT* LoadingGrid::GetCellAtCoordinates(orxS32 x, orxS32 y) const
+{
     orxU64 CellID = ((orxU64)x << 32) | (orxU32)y;
     orxOBJECT* Cell = (orxOBJECT*)orxHashTable_Get(m_CellTable, CellID);
 
