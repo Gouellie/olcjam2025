@@ -256,11 +256,6 @@ static orxSTATUS orxFASTCALL orxContainer_EventHandler(const orxEVENT *_pstEvent
         listSorted[listSize] = poContainerObject->GetOrxObject();
         listSize++;
       }
-      else
-      {
-        /* Free */
-        orxBank_Free(sstObject.pstContainerBank, pstGUID);
-      }
     }
 
     if (listSize > 1)

@@ -174,7 +174,7 @@ void orxContainerObject::OnCreate()
 
 void orxContainerObject::OnDelete()
 {
-
+    orxContainerBank_UnregisterContainer(GetOrxObject());
 }
 
 void orxContainerObject::Update(const orxCLOCK_INFO& _rstInfo)

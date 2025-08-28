@@ -54,8 +54,23 @@ orxSTATUS orxContainerBank_RegisterContainer(orxOBJECT* _pstObject)
 orxSTATUS orxContainerBank_UnregisterContainer(orxOBJECT* _pstObject)
 {
   orxSTATUS eResult = orxSTATUS_FAILURE;
-
-  // TODO
+  if (_pstObject != orxNULL) 
+  {
+      orxU64 objectID = orxStructure_GetGUID(_pstObject);
+      orxU64* pstGUID;
+      /* For all containers objects */
+      for (pstGUID = (orxU64*)orxBank_GetNext(sstObject.pstContainerBank, orxNULL);
+          pstGUID != orxNULL;
+          pstGUID = (orxU64*)orxBank_GetNext(sstObject.pstContainerBank, pstGUID))
+      {
+          if (*pstGUID == objectID) 
+          {
+              orxBank_Free(sstObject.pstContainerBank, pstGUID);
+              eResult = orxSTATUS_SUCCESS;
+              break;
+          }
+      }
+  }
 
   // Done!
   return eResult;
