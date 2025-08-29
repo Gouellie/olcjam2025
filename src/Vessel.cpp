@@ -96,6 +96,7 @@ void Vessel::SetIsDocking(orxBOOL isDocking)
         if (Vacuum* pstVacuum = (Vacuum*)olcjam2025::GetInstance().GetObject(m_VacuumGUID))
         {
             pstVacuum->SetIsBeamLocked(orxTRUE);
+            pstVacuum->Enable(orxFALSE, orxTRUE);
             m_CameraBox.SetIsVacuumLocked(orxTRUE);
 
             if (m_IsZooming) 
@@ -113,6 +114,7 @@ void Vessel::SetIsDocked(orxBOOL isDocked)
     if (Vacuum* pstVacuum = (Vacuum*)olcjam2025::GetInstance().GetObject(m_VacuumGUID))
     {
         pstVacuum->SetIsBeamLocked(m_IsDocked);
+        pstVacuum->Enable(m_IsDocked == false, orxTRUE);
         m_CameraBox.SetIsVacuumLocked(m_IsDocked);
     }
 }

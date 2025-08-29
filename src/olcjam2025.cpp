@@ -9,6 +9,7 @@
 
 #include "Object.h"
 #include "LoadingGrid.h"
+#include "RadialMenu.h"
 #include "Shape.h"
 #include "Starbase.h"
 #include "Vacuum.h"
@@ -60,10 +61,49 @@ static orxSTATUS orxFASTCALL InputEventHandler(const orxEVENT* _pstEvent)
 void olcjam2025::Update(const orxCLOCK_INFO &_rstClockInfo)
 {
   // Should quit?
-  if(orxInput_HasBeenActivated("Quit"))
+  if (orxInput_HasBeenActivated("Quit"))
   {
     // Send close event
     orxEvent_SendShort(orxEVENT_TYPE_SYSTEM, orxSYSTEM_EVENT_CLOSE);
+  }
+  else if (orxInput_HasBeenActivated("BackToTitleScreen"))
+  {
+      orxObject_CreateFromConfig("TitleSceneBack");
+      m_bIsInTitleScreen = orxTRUE;
+  }
+  else if (orxInput_HasBeenActivated("Resume"))
+  {
+      orxObject_CreateFromConfig("ClearOptionScreen");
+  }
+  else if (orxInput_HasBeenActivated("Options"))
+  {
+      if (m_bIsInTitleScreen == orxFALSE) 
+      {
+          if (m_bIsOptionScreenShown)
+          {
+              orxObject_CreateFromConfig("ClearOptionScreen");
+              m_bIsOptionScreenShown = orxFALSE;
+          }
+          else
+          {
+              orxObject_CreateFromConfig("OptionScreen");
+              m_bIsOptionScreenShown = orxTRUE;
+          }
+      }
+  }
+  else if (orxInput_HasBeenActivated("PlayGame"))
+  {
+      orxObject_CreateFromConfig("WorldScene");
+      m_bIsInTitleScreen = orxFALSE;
+  }
+  else if (orxInput_HasBeenActivated("Sandbox"))
+  {
+      orxObject_CreateFromConfig("SandboxScene");
+      m_bIsInTitleScreen = orxFALSE;
+  }
+  else if (orxInput_HasBeenActivated("RadialMenuOptionUnset"))
+  {
+      orxLOG("[WARNING] Triggering Input from unset RadialMenuOption");
   }
 }
 
@@ -154,6 +194,8 @@ void olcjam2025::BindObjects()
 {
   BindObject(Object);
   BindObject(LoadingGrid);
+  BindObject(RadialMenu);
+  BindObject(RadialMenuOption);
   BindObject(Shape);
   BindObject(Starbase);
   BindObject(Vacuum);

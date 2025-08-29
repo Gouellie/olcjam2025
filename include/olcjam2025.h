@@ -31,11 +31,13 @@ private:
                 void            Exit();
                 void            BindObjects();
 
-
 private:
                 
                 orxU64          m_ActiveVesselID    = 0;
                 orxBOOL         m_bIsUsingPad       = orxFALSE;
+
+                orxBOOL         m_bIsInTitleScreen      = orxTRUE;
+                orxBOOL         m_bIsOptionScreenShown  = orxFALSE;
 };
 
 #endif // __olcjam2025_H__

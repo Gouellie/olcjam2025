@@ -28,33 +28,32 @@ void Starbase::Update(const orxCLOCK_INFO &_rstInfo)
             orxVector_Lerp(&vesselPosition, &vesselPosition, &destination, m_DockingSpeed * _rstInfo.fDT);
             pstVessel->SetPosition(vesselPosition, orxTRUE);
 
-            if (orxVector_GetDistance(&vesselPosition, &destination) < 0.1f) 
+            if (orxVector_GetDistance(&vesselPosition, &destination) < 1.0f) 
             {
                 pstVessel->SetIsDocking(orxFALSE);
                 pstVessel->SetIsDocked(orxTRUE);
                 m_bIsDocking = orxFALSE;
+                m_bIsDocked = orxTRUE;
+                m_RadialMenuGUID = orxStructure_GetGUID(orxObject_CreateFromConfig("RadialMenuStarBase"));
+                m_DockedPosition = vesselPosition;
             }
         }
     }
-
-    if (orxInput_HasBeenActivated("Scan"))
+    else if (m_bIsDocked)
     {
-        //orxConfig_PushSection("Runtime");
-        //orxU64 shortGridID = orxConfig_GetU64("ShortRangeGrid");
-        //orxConfig_PopSection();
-
-        //LoadingGrid* pstShortRangeGrid = (LoadingGrid*)olcjam2025::GetInstance().GetObject(shortGridID);
-
-        //if (pstShortRangeGrid != orxNULL) 
-        //{
-        //    orxOBJECT* cell = pstShortRangeGrid->GetCellAtCoordinates(0, 2);
-        //    orxFLOAT cellSize = pstShortRangeGrid->GetCellSize();
-        //    orxOBJECT* logo = orxObject_CreateFromConfig("Logo");
-        //    orxObject_SetParent(logo, cell);
-        //    orxObject_SetOwner(logo, cell);
-        //    orxVECTOR position = { cellSize/2.f , cellSize/2.f };
-        //    orxObject_SetPosition(logo, &position);
-        //}
+        if (Vessel* pstVessel = (Vessel*)olcjam2025::GetInstance().GetObject(olcjam2025::GetInstance().GetActiveVesselID()))
+        {
+            orxVECTOR pos;
+            pstVessel->GetPosition(pos);
+            if (!orxVector_AreEqual(&m_DockedPosition, &pos))
+            {
+                pstVessel->SetIsDocked(orxFALSE);
+                if (orxOBJECT* pstRadialMenu = orxOBJECT(orxStructure_Get(m_RadialMenuGUID)))
+                {
+                    orxObject_SetLifeTime(pstRadialMenu, 0);
+                }
+            }
+        }
     }
 }
 
@@ -64,13 +63,5 @@ void Starbase::OnCollide(ScrollObject* _poCollider, orxBODY_PART* _pstPart, orxB
     {
         pstVessel->SetIsDocking(orxTRUE);
         m_bIsDocking = orxTRUE;
-    }
-}
-
-void Starbase::OnSeparate(ScrollObject* _poCollider, orxBODY_PART* _pstPart, orxBODY_PART* _pstColliderPart)
-{
-    if (Vessel* pstVessel = (Vessel*)_poCollider)
-    {
-        pstVessel->SetIsDocked(orxFALSE);
     }
 }
