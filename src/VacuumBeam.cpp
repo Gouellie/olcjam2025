@@ -4,6 +4,7 @@
  */
 
 #include "VacuumBeam.h"
+#include "Shape.h"
 
 void VacuumBeam::OnCreate()
 {
@@ -14,6 +15,13 @@ void VacuumBeam::OnCreate()
 
 void VacuumBeam::OnDelete()
 {
+    for (auto iter = m_collidingIDs.begin(); iter != m_collidingIDs.end(); iter++) 
+    {
+        if (Shape* poShape = (Shape*)olcjam2025::GetInstance().GetObject(*iter)) 
+        {
+            poShape->SetIsInTractorBeam(orxFALSE);
+        }
+    }
 }
 
 void VacuumBeam::Update(const orxCLOCK_INFO &_rstInfo)
@@ -45,18 +53,27 @@ void VacuumBeam::Update(const orxCLOCK_INFO &_rstInfo)
 
 void VacuumBeam::OnCollide(ScrollObject* _poCollider, orxBODY_PART* _pstPart, orxBODY_PART* _pstColliderPart, const orxVECTOR& _rvPosition, const orxVECTOR& _rvNormal)
 {
-   m_collidingIDs.push_back(orxStructure_GetGUID(_poCollider->GetOrxObject()));
+    if (Shape* poShape = (Shape*)_poCollider) 
+    {
+        m_collidingIDs.push_back(poShape->GetGUID());
+        poShape->SetIsInTractorBeam(orxTRUE);
+    }
 }
 
 void VacuumBeam::OnSeparate(ScrollObject* _poCollider, orxBODY_PART* _pstPart, orxBODY_PART* _pstColliderPart) 
 {
-    orxU64 guid = orxStructure_GetGUID(_poCollider->GetOrxObject());
-    for (auto iter = m_collidingIDs.begin(); iter != m_collidingIDs.end();) {
-        if (*iter == guid) {
-            iter = m_collidingIDs.erase(iter);
-        }
-        else {
-            ++iter;
+    if (Shape* poShape = (Shape*)_poCollider)
+    {
+        poShape->SetIsInTractorBeam(orxFALSE);
+        orxU64 guid = poShape->GetGUID();
+        for (auto iter = m_collidingIDs.begin(); iter != m_collidingIDs.end();) {
+            if (*iter == guid)
+            {
+                iter = m_collidingIDs.erase(iter);
+            }
+            else {
+                ++iter;
+            }
         }
     }
 }

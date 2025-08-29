@@ -34,6 +34,9 @@ void Vessel::OnCreate()
 
     orxConfig_GetListVector("MovingSpeed", 0, &m_vPlayerSpeed);
     orxConfig_GetListVector("MovingSpeed", 1, &m_vPlayerHighSpeed);
+
+    m_ShapesImpulseMultiplier = orxConfig_GetFloat("ShapesImpulseMultiplier");
+    m_ShapesCollisionFlag = (orxU16)orxPhysics_GetCollisionFlagValue("shape");
 }
 
 void Vessel::OnDelete()
@@ -111,5 +114,16 @@ void Vessel::SetIsDocked(orxBOOL isDocked)
     {
         pstVacuum->SetIsBeamLocked(m_IsDocked);
         m_CameraBox.SetIsVacuumLocked(m_IsDocked);
+    }
+}
+
+void Vessel::OnCollide(ScrollObject* _poCollider, orxBODY_PART* _pstPart, orxBODY_PART* _pstColliderPart, const orxVECTOR& _rvPosition, const orxVECTOR& _rvNormal) 
+{
+    if (orxBody_GetPartSelfFlags(_pstColliderPart) == m_ShapesCollisionFlag) 
+    {
+        orxVECTOR impulse;
+        orxVector_Neg(&impulse, &_rvNormal);
+        orxVector_Mulf(&impulse, &impulse, m_ShapesImpulseMultiplier);
+        orxBody_ApplyImpulse(orxBody_GetPartBody(_pstColliderPart), &impulse, &_rvPosition);
     }
 }

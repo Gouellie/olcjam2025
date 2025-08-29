@@ -18,16 +18,29 @@ void Shape::OnDelete()
 
 void Shape::Update(const orxCLOCK_INFO &_rstInfo)
 {
-    orxVECTOR vSpeed;
-    GetSpeed(vSpeed);
-    if (!orxVector_AreEqual(&vSpeed, &m_vPreviousSpeed)) 
+    if (m_IsInTractorBeam) 
+    {
+        orxVECTOR vSpeed;
+        GetSpeed(vSpeed);
+        if (!orxVector_AreEqual(&vSpeed, &m_vPreviousSpeed))
+        {
+            orxVECTOR vScale;
+            orxFLOAT speed = orxVector_GetSize(&vSpeed);
+            orxFLOAT scale = orxREMAP(orxFLOAT_0, orxFLOAT_1, m_vOriginalScale.fX, m_vOriginalScale.fX * 0.6f, orxMath_SmootherStep(80.f, 3000.f, speed));
+            orxVector_Set(&vScale, scale, scale, 1.0f);
+            SetScale(vScale);
+
+            m_vPreviousSpeed = vSpeed;
+        }
+    }
+    else
     {
         orxVECTOR vScale;
-        orxFLOAT speed = orxVector_GetSize(&vSpeed);
-        orxFLOAT scale = orxREMAP(orxFLOAT_0, orxFLOAT_1, m_vOriginalScale.fX, m_vOriginalScale.fX * 0.6f, orxMath_SmootherStep(80.f, 3000.f, speed));
-        orxVector_Set(&vScale, scale, scale, 1.0f);
-        SetScale(vScale);
-
-        m_vPreviousSpeed = vSpeed;
+        GetScale(vScale);
+        if (!orxVector_AreEqual(&vScale, &m_vOriginalScale))
+        {
+            orxVector_Lerp(&vScale, &vScale, &m_vOriginalScale, _rstInfo.fDT * 10.0f);
+            SetScale(vScale);
+        }
     }
 }

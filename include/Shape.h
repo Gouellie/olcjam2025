@@ -14,6 +14,7 @@ class Shape : public ScrollObject
 {
 public:
 
+                void            SetIsInTractorBeam(orxBOOL isInTractorBeam) { m_IsInTractorBeam = isInTractorBeam; }
 
 protected:
 
@@ -25,6 +26,8 @@ private:
 
                 orxVECTOR       m_vOriginalScale;
                 orxVECTOR       m_vPreviousSpeed;
+
+                orxBOOL         m_IsInTractorBeam;
 };
 
 #endif // __SHAPE_H__

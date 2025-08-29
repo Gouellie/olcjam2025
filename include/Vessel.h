@@ -25,6 +25,8 @@ protected:
                 void            OnDelete();
                 void            Update(const orxCLOCK_INFO &_rstInfo);
 
+                void            OnCollide(ScrollObject* _poCollider, orxBODY_PART* _pstPart, orxBODY_PART* _pstColliderPart, const orxVECTOR& _rvPosition, const orxVECTOR& _rvNormal);
+
 private:
 
                 orxVECTOR       m_PreviousCameraPos;
@@ -39,6 +41,9 @@ private:
                 orxBOOL         m_IsDocked;
 
                 orxU64          m_VacuumGUID;
+
+                orxFLOAT        m_ShapesImpulseMultiplier;
+                orxU16          m_ShapesCollisionFlag;
 
 private:
 
