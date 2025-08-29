@@ -10,6 +10,7 @@
 #include "Object.h"
 #include "LoadingGrid.h"
 #include "Shape.h"
+#include "Starbase.h"
 #include "Vacuum.h"
 #include "VacuumBeam.h"
 #include "Vessel.h"
@@ -154,6 +155,7 @@ void olcjam2025::BindObjects()
   BindObject(Object);
   BindObject(LoadingGrid);
   BindObject(Shape);
+  BindObject(Starbase);
   BindObject(Vacuum);
   BindObject(VacuumHead);
   BindObject(VacuumBeam);
