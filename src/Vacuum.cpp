@@ -10,8 +10,6 @@ void Vacuum::OnCreate()
 {
     m_RotationSpeed = orxConfig_GetFloat("RotationSpeed");
 
-    orxMouse_GetPosition(&m_previousMousePos);
-
     for (orxOBJECT* pstChild = orxObject_GetOwnedChild(GetOrxObject());
         pstChild != orxNULL;
         pstChild = orxObject_GetOwnedSibling(pstChild))
@@ -30,10 +28,8 @@ void Vacuum::OnDelete()
 
 void Vacuum::Update(const orxCLOCK_INFO &_rstInfo)
 {
-    orxVECTOR mousePosition;
-    orxMouse_GetPosition(&mousePosition);
-
     orxVECTOR VacuumHead;
+
     if (olcjam2025::GetInstance().GetIsUsingPad())
     {
         orxVector_Set(&VacuumHead,
@@ -47,18 +43,16 @@ void Vacuum::Update(const orxCLOCK_INFO &_rstInfo)
             m_DesiredRotation = get_angle(VacuumHead);
         }
     }
-    else
+    else if (orxOBJECT* pstVessel = orxOBJECT(orxStructure_Get(olcjam2025::GetInstance().GetActiveVesselID())))
     {
-        if (orxOBJECT* pstVessel = orxOBJECT(orxStructure_Get(olcjam2025::GetInstance().GetActiveVesselID())))
-        {
-            orxVECTOR vesselPosition, mousePositionWorld;
-            orxRender_GetWorldPosition(&mousePosition, orxViewport_Get("MainViewport"), &mousePositionWorld);
-            orxObject_GetWorldPosition(pstVessel, &vesselPosition);
-            orxVector_Sub(&VacuumHead, &mousePositionWorld, &vesselPosition);
-            m_DesiredRotation = get_angle(VacuumHead);
-        }
+        orxVECTOR mousePosition, vesselPosition;
+        orxMouse_GetPosition(&mousePosition);
+        orxObject_GetWorldPosition(pstVessel, &vesselPosition);
+        orxRender_GetScreenPosition(&vesselPosition, orxViewport_Get("MainViewport"), &vesselPosition);
 
-        m_previousMousePos = mousePosition;
+        orxVector_Sub(&VacuumHead, &mousePosition, &vesselPosition);
+
+        m_DesiredRotation = get_angle(VacuumHead);
     }
 
     SetRotation(lerp_angle(GetRotation(), m_DesiredRotation, _rstInfo.fDT * m_RotationSpeed));
