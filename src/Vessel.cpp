@@ -4,7 +4,7 @@
  */
 
 #include "Vessel.h"
-#include "CameraBox.h"
+#include "Vacuum.h"
 
 void Vessel::OnCreate()
 {
@@ -26,7 +26,8 @@ void Vessel::OnCreate()
     {
         if (orxString_Compare(orxObject_GetName(pstChild), "Vacuum") == 0)
         {
-            m_CameraBox.SetVacuumID(orxStructure_GetGUID(pstChild));
+            m_VacuumGUID = orxStructure_GetGUID(pstChild);
+            m_CameraBox.SetVacuumID(m_VacuumGUID);
             break;
         }
     }
@@ -41,8 +42,35 @@ void Vessel::OnDelete()
 
 void Vessel::Update(const orxCLOCK_INFO &_rstInfo)
 {
-    // Update player (and camera) position
+    if (m_IsDocking == false) 
+    {
+        MovePlayer(_rstInfo);
+
+        if (m_IsDocked == false) 
+        {
+            // Zoom Out?
+            if (orxInput_HasBeenActivated("Zoom"))
+            {
+                m_IsZooming = orxTRUE;
+                orxObject_AddTimeLineTrack(m_Camera, "ZoomOut");
+            }
+            // Zoom In?
+            else if (orxInput_HasBeenDeactivated("Zoom"))
+            {
+                m_IsZooming = orxFALSE;
+                orxObject_AddTimeLineTrack(m_Camera, "ZoomIn");
+            }
+        }
+    }
+
+    m_CameraBox.Update(_rstInfo);
+}
+
+void Vessel::MovePlayer(const orxCLOCK_INFO& _rstInfo)
+{
+    // Update player position
     orxVECTOR PlayerMove, PlayerPos, PlayerSpeed;
+
     orxVector_Mulf(&PlayerMove,
         orxVector_Mul(&PlayerMove,
             orxVector_Set(&PlayerMove,
@@ -51,20 +79,37 @@ void Vessel::Update(const orxCLOCK_INFO &_rstInfo)
                 orxFLOAT_0),
             orxVector_Lerp(&PlayerSpeed, &m_vPlayerSpeed, &m_vPlayerHighSpeed, orxInput_GetValue("Fast"))),
         _rstInfo.fDT);
+
     orxObject_SetPosition(GetOrxObject(), orxVector_Add(&PlayerPos,
         orxObject_GetPosition(GetOrxObject(), &PlayerPos),
         orxVector_Round(&PlayerMove, &PlayerMove)));
+}
 
-    // Zoom Out?
-    if (orxInput_HasBeenActivated("Zoom"))
+void Vessel::SetIsDocking(orxBOOL isDocking)
+{
+    m_IsDocking = isDocking;
+    if (m_IsDocking) 
     {
-        orxObject_AddTimeLineTrack(m_Camera, "ZoomOut");
-    }
-    // Zoom In?
-    else if (orxInput_HasBeenDeactivated("Zoom"))
-    {
-        orxObject_AddTimeLineTrack(m_Camera, "ZoomIn");
-    }
+        if (Vacuum* pstVacuum = (Vacuum*)olcjam2025::GetInstance().GetObject(m_VacuumGUID))
+        {
+            pstVacuum->SetIsBeamLocked(orxTRUE);
+            m_CameraBox.SetIsVacuumLocked(orxTRUE);
 
-    m_CameraBox.Update(_rstInfo);
+            if (m_IsZooming) 
+            {
+                m_IsZooming = orxFALSE;
+                orxObject_AddTimeLineTrack(m_Camera, "ZoomIn");
+            }
+        }
+    }
+}
+
+void Vessel::SetIsDocked(orxBOOL isDocked)
+{
+    m_IsDocked = isDocked;
+    if (Vacuum* pstVacuum = (Vacuum*)olcjam2025::GetInstance().GetObject(m_VacuumGUID))
+    {
+        pstVacuum->SetIsBeamLocked(m_IsDocked);
+        m_CameraBox.SetIsVacuumLocked(m_IsDocked);
+    }
 }

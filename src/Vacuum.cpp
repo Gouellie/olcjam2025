@@ -57,9 +57,30 @@ void Vacuum::Update(const orxCLOCK_INFO &_rstInfo)
 
     SetRotation(lerp_angle(GetRotation(), m_DesiredRotation, _rstInfo.fDT * m_RotationSpeed));
 
-    if (orxInput_HasBeenActivated("Vacuum"))
+    if (!m_IsBeamLocked && orxInput_HasBeenActivated("Vacuum"))
     {
-        if (orxOBJECT* vacuumHead = orxOBJECT(orxStructure_Get(m_vacuumHeadGUID))) 
+        SetIsBeamActive(orxTRUE);
+    }
+    else if (orxInput_HasBeenDeactivated("Vacuum"))
+    {
+        SetIsBeamActive(orxFALSE);
+    }
+}
+
+void Vacuum::SetIsBeamLocked(orxBOOL isBeamLocked)
+{
+    m_IsBeamLocked = isBeamLocked;
+    if (m_IsBeamLocked) 
+    {
+        SetIsBeamActive(orxFALSE);
+    }
+}
+
+void Vacuum::SetIsBeamActive(orxBOOL isBeamActive)
+{
+    if (isBeamActive)
+    {
+        if (orxOBJECT* vacuumHead = orxOBJECT(orxStructure_Get(m_vacuumHeadGUID)))
         {
             orxObject_SetTargetAnim(vacuumHead, "Active");
         }
@@ -68,7 +89,7 @@ void Vacuum::Update(const orxCLOCK_INFO &_rstInfo)
         orxObject_SetParent(vacuumBeam, GetOrxObject());
         m_vacuumBeamGUID = orxStructure_GetGUID(vacuumBeam);
     }
-    else if (orxInput_HasBeenDeactivated("Vacuum"))
+    else
     {
         if (orxOBJECT* vacuumHead = orxOBJECT(orxStructure_Get(m_vacuumHeadGUID)))
         {

@@ -34,8 +34,8 @@ private:
 
 private:
                 
-                orxU64          m_ActiveVesselID;
-                orxBOOL         m_bIsUsingPad;
+                orxU64          m_ActiveVesselID    = 0;
+                orxBOOL         m_bIsUsingPad       = orxFALSE;
 };
 
 #endif // __olcjam2025_H__

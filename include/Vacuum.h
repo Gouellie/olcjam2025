@@ -14,6 +14,7 @@ class Vacuum : public ScrollObject
 {
 public:
 
+    void            SetIsBeamLocked(orxBOOL isBeamLocked);
 
 protected:
 
@@ -23,10 +24,13 @@ protected:
 
 private:
 
+    orxBOOL         m_IsBeamLocked;
     orxFLOAT        m_DesiredRotation = orxFLOAT_0;
     orxFLOAT        m_RotationSpeed;
     orxU64          m_vacuumHeadGUID;
     orxU64          m_vacuumBeamGUID;
+
+    void            SetIsBeamActive(orxBOOL isBeamActive);
 };
 
 class VacuumHead : public ScrollObject

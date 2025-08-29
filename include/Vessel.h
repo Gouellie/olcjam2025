@@ -8,7 +8,7 @@
 
 #include "olcjam2025.h"
 
-#include"CameraBox.h"
+#include "CameraBox.h"
 
 /** Vessel Class
  */
@@ -16,6 +16,8 @@ class Vessel : public ScrollObject
 {
 public:
 
+                void            SetIsDocking(orxBOOL isDocking);
+                void            SetIsDocked(orxBOOL isDocked);
 
 protected:
 
@@ -31,6 +33,16 @@ private:
 
                 orxVECTOR       m_vPlayerSpeed;
                 orxVECTOR       m_vPlayerHighSpeed;
+
+                orxBOOL         m_IsZooming;
+                orxBOOL         m_IsDocking;
+                orxBOOL         m_IsDocked;
+
+                orxU64          m_VacuumGUID;
+
+private:
+
+                void            MovePlayer(const orxCLOCK_INFO& _rstInfo);
 };
 
 #endif // __VESSEL_H__

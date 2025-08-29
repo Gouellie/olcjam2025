@@ -76,12 +76,17 @@ void CameraBox::Update(const orxCLOCK_INFO& _rstInfo)
     orxConfig_PopSection();
 }
 
-orxBOOL CameraBox::GetBeamActive()
+orxBOOL CameraBox::GetBeamActive() const
 {
+    if (m_VacuumLocked) 
+    {
+        return orxFALSE;
+    }
+
     return orxInput_IsActive("Vacuum");
 }
 
-orxFLOAT CameraBox::GetBeamPosition()
+orxFLOAT CameraBox::GetBeamPosition() const
 {
     if (orxOBJECT* vacuum = orxOBJECT(orxStructure_Get(m_VacuumGUID)))
     {
