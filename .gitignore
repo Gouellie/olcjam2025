@@ -8,3 +8,4 @@ bin/imgui.ini
 *.obr
 /.vscode
 /data/texture/tmp
+/data/sound/Temp
