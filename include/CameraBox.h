@@ -27,6 +27,7 @@ public:
 
 	orxBOOL GetBeamActive() const;
 	orxFLOAT GetBeamPosition() const;
-	orxFLOAT GetBeamLength();
+	orxFLOAT GetBeamLength() const;
+	orxBOOL TargetIsMoving() const;
 };
 

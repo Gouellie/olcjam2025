@@ -16,45 +16,58 @@ void CameraBox::Update(const orxCLOCK_INFO& _rstInfo)
 
     orxVECTOR delta = orxVECTOR_0;
 
-    //X Axis
     orxVECTOR targetPos = m_Target->GetPosition(targetPos);
-    orxFLOAT dx = targetPos.fX - m_TargetLock.fX;
+
     orxVECTOR cameraPrevPos = orxVECTOR_0;
     cameraPrevPos = *orxObject_GetPosition(m_Camera, &cameraPrevPos);
 
-    if (targetPos.fX > m_TargetLock.fX)
+    orxVECTOR speed = orxVECTOR_0;
+    speed = m_Target->GetSpeed(speed);
+    // I'd like to have something more generic instead, but this is a patch
+    //if (orxVector_IsNull(&speed))
+    if (!TargetIsMoving())
     {
-        const orxFLOAT boundRight = orxConfig_GetFloat("BoundRight");
-        if (orxMath_Abs(dx) > boundRight)
-        {
-            delta.fX = orxMath_Abs(dx) - boundRight;
-        }
+        m_TargetLock = targetPos;
     }
     else
     {
-        const orxFLOAT boundLeft = orxConfig_GetFloat("BoundLeft");
-        if (orxMath_Abs(dx) > boundLeft)
-        {
-            delta.fX = -(orxMath_Abs(dx) - boundLeft);
-        }
-    }
+        //X Axis
+        orxFLOAT dx = targetPos.fX - m_TargetLock.fX;
 
-    //Y Axis
-    orxFLOAT dy = targetPos.fY - m_TargetLock.fY;
-    if (dy > 0)
-    {
-        const orxFLOAT boundTop = orxConfig_GetFloat("BoundTop");
-        if (orxMath_Abs(dy) > boundTop)
+        if (targetPos.fX > m_TargetLock.fX)
         {
-            delta.fY = orxMath_Abs(dy) - boundTop;
+            const orxFLOAT boundRight = orxConfig_GetFloat("BoundRight");
+            if (orxMath_Abs(dx) > boundRight)
+            {
+                delta.fX = orxMath_Abs(dx) - boundRight;
+            }
         }
-    }
-    else
-    {
-        const orxFLOAT boundBottom = orxConfig_GetFloat("BoundBottom");
-        if (orxMath_Abs(dy) > boundBottom)
+        else
         {
-            delta.fY = -(orxMath_Abs(dy) - boundBottom);
+            const orxFLOAT boundLeft = orxConfig_GetFloat("BoundLeft");
+            if (orxMath_Abs(dx) > boundLeft)
+            {
+                delta.fX = -(orxMath_Abs(dx) - boundLeft);
+            }
+        }
+
+        //Y Axis
+        orxFLOAT dy = targetPos.fY - m_TargetLock.fY;
+        if (dy > 0)
+        {
+            const orxFLOAT boundTop = orxConfig_GetFloat("BoundTop");
+            if (orxMath_Abs(dy) > boundTop)
+            {
+                delta.fY = orxMath_Abs(dy) - boundTop;
+            }
+        }
+        else
+        {
+            const orxFLOAT boundBottom = orxConfig_GetFloat("BoundBottom");
+            if (orxMath_Abs(dy) > boundBottom)
+            {
+                delta.fY = -(orxMath_Abs(dy) - boundBottom);
+            }
         }
     }
 
@@ -96,11 +109,16 @@ orxFLOAT CameraBox::GetBeamPosition() const
     return orxFLOAT_0;
 }
 
-orxFLOAT CameraBox::GetBeamLength()
+orxFLOAT CameraBox::GetBeamLength() const
 {
     orxVECTOR beamSize = orxVECTOR_0;
     orxConfig_PushSection("VacuumBeam");
     beamSize = *orxConfig_GetVector("Size", &beamSize);
     orxConfig_PopSection();
     return beamSize.fY;
+}
+
+orxBOOL CameraBox::TargetIsMoving() const
+{
+    return orxInput_IsActive("Right") | orxInput_IsActive("Left") | orxInput_IsActive("Down") | orxInput_IsActive("Up");
 }
