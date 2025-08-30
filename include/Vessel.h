@@ -31,6 +31,7 @@ private:
 
                 orxVECTOR       m_PreviousCameraPos;
                 orxOBJECT*      m_Camera;
+                orxOBJECT*      m_pstCompass;
                 CameraBox       m_CameraBox;
 
                 orxVECTOR       m_vPlayerSpeed;

@@ -10,3 +10,4 @@ bin/imgui.ini
 /data/texture/tmp
 /data/sound/Temp
 *.wav
+*.png~

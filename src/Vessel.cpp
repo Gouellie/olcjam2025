@@ -39,8 +39,8 @@ void Vessel::OnCreate()
     m_ShapesImpulseMultiplier = orxConfig_GetFloat("ShapesImpulseMultiplier");
     m_ShapesCollisionFlag = (orxU16)orxPhysics_GetCollisionFlagValue("shape");
 
-    //orxOBJECT* pstCompass = orxObject_CreateFromConfig("VesselCompass");
-    //orxObject_SetOwner(pstCompass, GetOrxObject());
+    m_pstCompass = orxObject_CreateFromConfig("VesselCompass");
+    orxObject_SetOwner(m_pstCompass, GetOrxObject());
 }
 
 void Vessel::OnDelete()
@@ -200,15 +200,21 @@ void Vessel::DrawCompassToObject(orxOBJECT* _pstDestination)
 
     if (GetIsObjectInView(pstViewport, destinationPos))
     {
+        /* Object is in view, no compass needed */
+        orxObject_Enable(m_pstCompass, orxFALSE);
         return;
     }
     
     if (GetCompassWorldPositionForViewport(pstViewport, vesselPosition, destinationPos, res))
     {
-        //pstViewport = orxViewport_Get("HUDViewport");
         if (orxRender_GetScreenPosition(&res, pstViewport, &res) != orxNULL) 
         {
-            orxDisplay_DrawCircle(&res, 10.0f, orxRGBA_Set(255, 0, 0, 255), orxTRUE);
+            orxObject_Enable(m_pstCompass, orxTRUE);
+            orxVECTOR facing;
+            orxVector_Sub(&facing, &vesselPosition, &destinationPos);
+            orxObject_SetRotation(m_pstCompass, get_angle(facing));
+            orxRender_GetWorldPosition(&res, orxViewport_Get("HUDViewport"), &res);
+            orxObject_SetWorldPosition(m_pstCompass, &res);
         }
     }
 }
