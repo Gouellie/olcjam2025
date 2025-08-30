@@ -195,6 +195,8 @@ void Vessel::OnCollide(ScrollObject* _poCollider, orxBODY_PART* _pstPart, orxBOD
         orxVector_Neg(&impulse, &_rvNormal);
         orxVector_Mulf(&impulse, &impulse, m_ShapesImpulseMultiplier);
         orxBody_ApplyImpulse(orxBody_GetPartBody(_pstColliderPart), &impulse, &_rvPosition);
+
+        AddSound("Sound_BounceFromShip");
     }
 }
 
