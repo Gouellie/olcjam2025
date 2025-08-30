@@ -37,7 +37,10 @@ void Starbase::Update(const orxCLOCK_INFO &_rstInfo)
             pstVessel->SetIsDocked(orxTRUE);
             m_bIsDocking = orxFALSE;
             m_bIsDocked = orxTRUE;
-            m_RadialMenuGUID = orxStructure_GetGUID(orxObject_CreateFromConfig("RadialMenuStarBase"));
+
+            orxOBJECT* radialMenu = orxObject_CreateFromConfig("RadialMenuStarBase");
+            orxObject_SetOwner(radialMenu, GetOrxObject());
+            m_RadialMenuGUID = orxStructure_GetGUID(radialMenu);
             m_DockedPosition = vesselPosition;
         }
     }

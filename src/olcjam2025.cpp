@@ -77,10 +77,15 @@ void olcjam2025::Update(const orxCLOCK_INFO &_rstClockInfo)
   }
   else if (orxInput_HasBeenActivated("Options"))
   {
-      if (m_bIsInTitleScreen == orxFALSE) 
+      if (m_bIsInTitleScreen) 
+      {
+          orxEvent_SendShort(orxEVENT_TYPE_SYSTEM, orxSYSTEM_EVENT_CLOSE);
+      }
+      else
       {
           if (m_bIsOptionScreenShown)
           {
+              orxObject_CreateFromConfig("UIOptionMenuSound");
               orxObject_CreateFromConfig("ClearOptionScreen");
               m_bIsOptionScreenShown = orxFALSE;
           }
@@ -90,6 +95,12 @@ void olcjam2025::Update(const orxCLOCK_INFO &_rstClockInfo)
               m_bIsOptionScreenShown = orxTRUE;
           }
       }
+  }
+  else if (orxInput_HasBeenActivated("ToggleSound")) 
+  {
+      orxFLOAT busVolume = orxSound_GetBusVolume(orxSound_GetMasterBusID());
+      busVolume = busVolume == orxFLOAT_0 ? orxFLOAT_1 : orxFLOAT_0;
+      orxSound_SetBusVolume(orxSound_GetMasterBusID(), busVolume);
   }
   else if (orxInput_HasBeenActivated("PlayGame"))
   {
