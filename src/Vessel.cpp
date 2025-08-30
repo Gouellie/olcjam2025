@@ -37,6 +37,9 @@ void Vessel::OnCreate()
 
     m_ShapesImpulseMultiplier = orxConfig_GetFloat("ShapesImpulseMultiplier");
     m_ShapesCollisionFlag = (orxU16)orxPhysics_GetCollisionFlagValue("shape");
+
+    //orxOBJECT* pstCompass = orxObject_CreateFromConfig("VesselCompass");
+    //orxObject_SetOwner(pstCompass, GetOrxObject());
 }
 
 void Vessel::OnDelete()
@@ -48,6 +51,11 @@ void Vessel::Update(const orxCLOCK_INFO &_rstInfo)
     if (m_IsDocking == false) 
     {
         MovePlayer(_rstInfo);
+
+        if (orxOBJECT* pstNearest = GetNearestStarBase()) 
+        {
+            DrawCompassToObject(pstNearest);
+        }
 
         if (m_IsDocked == false) 
         {
@@ -148,4 +156,49 @@ void Vessel::OnCollide(ScrollObject* _poCollider, orxBODY_PART* _pstPart, orxBOD
         orxVector_Mulf(&impulse, &impulse, m_ShapesImpulseMultiplier);
         orxBody_ApplyImpulse(orxBody_GetPartBody(_pstColliderPart), &impulse, &_rvPosition);
     }
+}
+
+orxOBJECT* Vessel::GetNearestStarBase()
+{
+    orxOBJECT* pstObject = orxNULL, * pstNearest = orxNULL;
+    orxVECTOR worldPos, pos;
+    GetPosition(worldPos, orxTRUE);
+
+    orxFLOAT nearestDistance = orxFLOAT_MAX;
+
+    do {
+        orxSTRINGID id = orxString_GetID("Starbase");
+        pstObject = orxObject_GetNext(pstObject, id);
+        if (pstObject != orxNULL) {
+            orxObject_GetWorldPosition(pstObject, &pos);
+            orxFLOAT distance = orxVector_GetDistance(&pos, &worldPos);
+            if (distance < nearestDistance)
+            {
+                nearestDistance = distance;
+                pstNearest = pstObject;
+            }
+        }
+    } while (pstObject);
+
+    if (pstNearest != orxNULL)
+    {
+        return pstNearest;
+    }
+
+    return nullptr;
+}
+
+void Vessel::DrawCompassToObject(orxOBJECT* _pstDestination)
+{
+    orxVIEWPORT* pstViewport;
+    pstViewport = orxViewport_Get("MainViewport");
+
+    orxVECTOR vesselPosition, destinationPos;
+    GetPosition(vesselPosition, orxTRUE);
+    orxObject_GetWorldPosition(_pstDestination, &destinationPos);
+
+    orxRender_GetScreenPosition(&vesselPosition, pstViewport, &vesselPosition);
+    orxRender_GetScreenPosition(&destinationPos, pstViewport, &destinationPos);
+
+    //orxDisplay_DrawLine(&vesselPosition, &destinationPos, orxRGBA_Set(255,255,255,255));
 }

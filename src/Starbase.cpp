@@ -17,46 +17,44 @@ void Starbase::OnDelete()
 
 void Starbase::Update(const orxCLOCK_INFO &_rstInfo)
 {
+    Vessel* pstVessel = (Vessel*)olcjam2025::GetInstance().GetObject(olcjam2025::GetInstance().GetActiveVesselID());
+    if (pstVessel == orxNULL)
+        return;
+
     if (m_bIsDocking) 
     {
-        if (Vessel* pstVessel = (Vessel*)olcjam2025::GetInstance().GetObject(olcjam2025::GetInstance().GetActiveVesselID()))
+        orxVECTOR destination, vesselPosition;
+        GetPosition(destination, orxTRUE);
+
+        pstVessel->GetPosition(vesselPosition, orxTRUE);
+        orxVector_Lerp(&vesselPosition, &vesselPosition, &destination, m_DockingSpeed * _rstInfo.fDT);
+        pstVessel->SetPosition(vesselPosition, orxTRUE);
+
+        if (orxVector_GetDistance(&vesselPosition, &destination) < 1.0f) 
         {
-            orxVECTOR destination, vesselPosition;
-            GetPosition(destination, orxTRUE);
-
-            pstVessel->GetPosition(vesselPosition, orxTRUE);
-            orxVector_Lerp(&vesselPosition, &vesselPosition, &destination, m_DockingSpeed * _rstInfo.fDT);
-            pstVessel->SetPosition(vesselPosition, orxTRUE);
-
-            if (orxVector_GetDistance(&vesselPosition, &destination) < 1.0f) 
-            {
-                AddTrack("StarbaseShipDockedTrack");
-                pstVessel->SetIsDocking(orxFALSE);
-                pstVessel->SetIsDocked(orxTRUE);
-                m_bIsDocking = orxFALSE;
-                m_bIsDocked = orxTRUE;
-                m_RadialMenuGUID = orxStructure_GetGUID(orxObject_CreateFromConfig("RadialMenuStarBase"));
-                m_DockedPosition = vesselPosition;
-            }
+            AddTrack("StarbaseShipDockedTrack");
+            pstVessel->SetIsDocking(orxFALSE);
+            pstVessel->SetIsDocked(orxTRUE);
+            m_bIsDocking = orxFALSE;
+            m_bIsDocked = orxTRUE;
+            m_RadialMenuGUID = orxStructure_GetGUID(orxObject_CreateFromConfig("RadialMenuStarBase"));
+            m_DockedPosition = vesselPosition;
         }
     }
     else if (m_bIsDocked)
     {
-        if (Vessel* pstVessel = (Vessel*)olcjam2025::GetInstance().GetObject(olcjam2025::GetInstance().GetActiveVesselID()))
+        orxVECTOR pos;
+        pstVessel->GetPosition(pos);
+        if (!orxVector_AreEqual(&m_DockedPosition, &pos))
         {
-            orxVECTOR pos;
-            pstVessel->GetPosition(pos);
-            if (!orxVector_AreEqual(&m_DockedPosition, &pos))
+            pstVessel->SetIsDocked(orxFALSE);
+            AddTrack("StarbaseShipUndockedTrack");
+            if (orxOBJECT* pstRadialMenu = orxOBJECT(orxStructure_Get(m_RadialMenuGUID)))
             {
-                pstVessel->SetIsDocked(orxFALSE);
-                AddTrack("StarbaseShipUndockedTrack");
-                if (orxOBJECT* pstRadialMenu = orxOBJECT(orxStructure_Get(m_RadialMenuGUID)))
-                {
-                    orxObject_SetLifeTime(pstRadialMenu, 0);
-                }
-
-                m_bIsDocked = orxFALSE;
+                orxObject_SetLifeTime(pstRadialMenu, 0);
             }
+
+            m_bIsDocked = orxFALSE;
         }
     }
 }

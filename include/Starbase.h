@@ -31,6 +31,10 @@ private:
                 orxBOOL         m_bIsDocked;
 
                 orxVECTOR       m_DockedPosition;
+
+                orxBOOL         m_IsDiscovered;
+
+                Starbase*       GetNearestStarBase();
 };
 
 #endif // __STARBASE_H__

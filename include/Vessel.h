@@ -50,6 +50,8 @@ private:
 private:
 
                 void            MovePlayer(const orxCLOCK_INFO& _rstInfo);
+                orxOBJECT*      GetNearestStarBase();
+                void            DrawCompassToObject(orxOBJECT* pos);
 };
 
 #endif // __VESSEL_H__
