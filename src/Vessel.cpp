@@ -5,6 +5,7 @@
 
 #include "Vessel.h"
 #include "Vacuum.h"
+#include "MoreMath.h"
 
 void Vessel::OnCreate()
 {
@@ -193,12 +194,80 @@ void Vessel::DrawCompassToObject(orxOBJECT* _pstDestination)
     orxVIEWPORT* pstViewport;
     pstViewport = orxViewport_Get("MainViewport");
 
-    orxVECTOR vesselPosition, destinationPos;
+    orxVECTOR vesselPosition, destinationPos, res;
     GetPosition(vesselPosition, orxTRUE);
     orxObject_GetWorldPosition(_pstDestination, &destinationPos);
 
-    orxRender_GetScreenPosition(&vesselPosition, pstViewport, &vesselPosition);
-    orxRender_GetScreenPosition(&destinationPos, pstViewport, &destinationPos);
+    if (GetIsObjectInView(pstViewport, destinationPos))
+    {
+        return;
+    }
+    
+    if (GetCompassWorldPositionForViewport(pstViewport, vesselPosition, destinationPos, res))
+    {
+        //pstViewport = orxViewport_Get("HUDViewport");
+        if (orxRender_GetScreenPosition(&res, pstViewport, &res) != orxNULL) 
+        {
+            orxDisplay_DrawCircle(&res, 10.0f, orxRGBA_Set(255, 0, 0, 255), orxTRUE);
+        }
+    }
+}
 
-    //orxDisplay_DrawLine(&vesselPosition, &destinationPos, orxRGBA_Set(255,255,255,255));
+orxBOOL Vessel::GetIsObjectInView(const orxVIEWPORT* _pstViewport,const orxVECTOR& _worldPosition)
+{
+    orxVECTOR dummy;
+    orxRender_GetScreenPosition(&_worldPosition, _pstViewport, &dummy);
+    return orxRender_GetWorldPosition(&dummy, _pstViewport, &dummy) != orxNULL;
+}
+
+orxBOOL Vessel::GetCompassWorldPositionForViewport(const orxVIEWPORT* _pstViewport, const orxVECTOR& _origin, const orxVECTOR& _dest, orxVECTOR& result)
+{
+    orxCAMERA* pstCamera;
+    orxAABOX  stFrustum;
+    orxVECTOR vCameraPosition;
+
+    pstCamera = orxViewport_GetCamera(_pstViewport);
+
+    /* Gets camera position */
+    orxFrame_GetPosition(orxCamera_GetFrame(pstCamera), orxFRAME_SPACE_GLOBAL, &vCameraPosition);
+
+    /* Gets its frustum */
+    orxCamera_GetFrustum(pstCamera, &stFrustum);
+
+    /* To adjust frustum to scale */
+    orxOBJECT* parent = orxOBJECT(orxCamera_GetParent(pstCamera));
+    orxVECTOR scale;
+    orxObject_GetScale(parent, &scale);
+
+    /* Add offset from screen border */
+    orxVECTOR frameOffset;
+    orxVector_Set(&frameOffset, 100.0f, 100.0f, 0.0f);
+    orxVector_Mulf(&frameOffset, &frameOffset, scale.fX);
+
+    /* Get TopLeft-BottomRight Position in WorldSpace */
+    orxVECTOR topLeftPos, bottomRightPos, bottomLeftPos, topRightPos;
+    orxVector_Copy(&topLeftPos, &stFrustum.vTL);
+    orxVector_Mulf(&topLeftPos, &topLeftPos, scale.fX);
+    orxVector_Neg(&bottomRightPos, &topLeftPos);
+    orxVector_Add(&topLeftPos, &topLeftPos, &vCameraPosition);
+    orxVector_Add(&topLeftPos, &topLeftPos, &frameOffset);
+    orxVector_Add(&bottomRightPos, &bottomRightPos, &vCameraPosition);
+    orxVector_Sub(&bottomRightPos, &bottomRightPos, &frameOffset);
+
+    /* Set BottomLeft TopRight */
+    orxVector_Set(&bottomLeftPos, topLeftPos.fX, bottomRightPos.fY, orxFLOAT_0);
+    orxVector_Set(&topRightPos, bottomRightPos.fX, topLeftPos.fY, orxFLOAT_0);
+
+    /* Find intersection with Frame if any */
+    orxVECTOR intersectionPoint;
+    if (doIntersect(topLeftPos, topRightPos, _origin, _dest, intersectionPoint) || 
+        doIntersect(topRightPos, bottomRightPos, _origin, _dest, intersectionPoint) ||
+        doIntersect(bottomRightPos, bottomLeftPos, _origin, _dest, intersectionPoint) ||
+        doIntersect(topLeftPos, bottomLeftPos, _origin, _dest, intersectionPoint))
+    {
+        orxVector_Copy(&result, &intersectionPoint);
+        return orxTRUE;
+    }
+
+    return orxFALSE;
 }
