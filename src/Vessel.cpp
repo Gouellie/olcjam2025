@@ -5,7 +5,9 @@
 
 #include "Vessel.h"
 #include "Vacuum.h"
+#include "Starbase.h"
 #include "MoreMath.h"
+#include "Utils.h"
 
 void Vessel::OnCreate()
 {
@@ -58,7 +60,28 @@ void Vessel::Update(const orxCLOCK_INFO &_rstInfo)
             DrawCompassToObject(pstNearest);
         }
 
-        if (m_IsDocked == false) 
+        if (m_IsDocked)
+        {
+            if (orxInput_HasBeenActivated("TeleportPrevious"))
+            {
+                if (orxOBJECT* next = GetPreviousStarBase())
+                {
+                    orxVECTOR pos;
+                    orxObject_GetWorldPosition(next, &pos);
+                    SetPosition(pos, orxTRUE);
+                }
+            }
+            else if (orxInput_HasBeenActivated("TeleportNext"))
+            {
+                if (orxOBJECT* next = GetNextStarBase())
+                {
+                    orxVECTOR pos;
+                    orxObject_GetWorldPosition(next, &pos);
+                    SetPosition(pos, orxTRUE);
+                }
+            }
+        }
+        else
         {
             // Zoom Out?
             if (orxInput_HasBeenActivated("Zoom"))
@@ -71,6 +94,17 @@ void Vessel::Update(const orxCLOCK_INFO &_rstInfo)
             {
                 m_IsZooming = orxFALSE;
                 orxObject_AddTimeLineTrack(m_Camera, "ZoomIn");
+            }
+        }
+
+        if (orxInput_HasBeenActivated("ReturnToStarBase"))
+        {
+            orxOBJECT* sb = GetNearestStarBase();
+            if (sb != orxNULL)
+            {
+                orxVECTOR pos;
+                orxObject_GetWorldPosition(sb, &pos);
+                SetPosition(pos, orxTRUE);
             }
         }
     }
@@ -148,6 +182,11 @@ void Vessel::SetIsDocked(orxBOOL isDocked)
     }
 }
 
+void Vessel::GetCameraPosition(orxVECTOR& position) const
+{
+    m_CameraBox.GetCameraPosition(position);
+}
+
 void Vessel::OnCollide(ScrollObject* _poCollider, orxBODY_PART* _pstPart, orxBODY_PART* _pstColliderPart, const orxVECTOR& _rvPosition, const orxVECTOR& _rvNormal) 
 {
     if (orxBody_GetPartSelfFlags(_pstColliderPart) == m_ShapesCollisionFlag) 
@@ -189,6 +228,51 @@ orxOBJECT* Vessel::GetNearestStarBase()
     return nullptr;
 }
 
+orxOBJECT* Vessel::GetPreviousStarBase()
+{
+    orxSTRINGID id = orxString_GetID("Starbase");
+
+    orxOBJECT* previous = orxNULL;
+    orxOBJECT* nearest = GetNearestStarBase();
+    orxOBJECT* tmp = orxObject_GetNext(orxNULL, id);
+    if (nearest == tmp)
+    {
+        // nearest is the first, we need to get last in the group
+        while (tmp != orxNULL) 
+        {
+            previous = tmp;
+            tmp = orxObject_GetNext(tmp, id);
+        }
+        return previous;
+    }
+    else 
+    {
+        while (tmp != orxNULL && tmp != nearest)
+        {
+            previous = tmp;
+            tmp = orxObject_GetNext(tmp, id);
+        }
+        return previous;
+    }
+
+    return orxNULL;
+}
+
+orxOBJECT* Vessel::GetNextStarBase()
+{
+    orxOBJECT* nearest = GetNearestStarBase();
+    orxSTRINGID id = orxString_GetID("Starbase");
+    orxOBJECT* next = orxObject_GetNext(nearest, id);
+    if (next == orxNULL)
+    {
+        // getting first
+        next = orxObject_GetNext(next, id);
+    }
+
+    // nearest can be null
+    return next;
+}
+
 void Vessel::DrawCompassToObject(orxOBJECT* _pstDestination)
 {
     orxVIEWPORT* pstViewport;
@@ -217,13 +301,6 @@ void Vessel::DrawCompassToObject(orxOBJECT* _pstDestination)
             orxObject_SetWorldPosition(m_pstCompass, &res);
         }
     }
-}
-
-orxBOOL Vessel::GetIsObjectInView(const orxVIEWPORT* _pstViewport,const orxVECTOR& _worldPosition)
-{
-    orxVECTOR dummy;
-    orxRender_GetScreenPosition(&_worldPosition, _pstViewport, &dummy);
-    return orxRender_GetWorldPosition(&dummy, _pstViewport, &dummy) != orxNULL;
 }
 
 orxBOOL Vessel::GetCompassWorldPositionForViewport(const orxVIEWPORT* _pstViewport, const orxVECTOR& _origin, const orxVECTOR& _dest, orxVECTOR& result)

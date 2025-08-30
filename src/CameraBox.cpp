@@ -86,6 +86,8 @@ void CameraBox::Update(const orxCLOCK_INFO& _rstInfo)
     orxVECTOR pos = *orxVector_Lerp(&pos, &cameraPrevPos, &m_DesiredPos, orxConfig_GetFloat("LerpSpeed") * _rstInfo.fDT);
     orxObject_SetPosition(m_Camera, &pos);
 
+    m_CameraPos = pos;
+
     orxConfig_PopSection();
 }
 

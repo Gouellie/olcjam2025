@@ -5,9 +5,13 @@
 class CameraBox
 {
 public:
+
+    void GetCameraPosition(orxVECTOR& position) const { position = m_CameraPos; }
+
 	orxU64 m_VacuumGUID;
 	orxOBJECT* m_Camera{ nullptr };
 	ScrollObject* m_Target{ nullptr };
+	orxVECTOR m_CameraPos{ orxVECTOR_0 };
 	orxVECTOR m_DesiredPos{ orxVECTOR_0 };
 	orxVECTOR m_TargetLock{ orxVECTOR_0 };
 	orxVECTOR m_BeamFacing{ orxVECTOR_Y };

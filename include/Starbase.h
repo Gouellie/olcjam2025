@@ -25,7 +25,7 @@ protected:
 
 private:
 
-                orxU64          m_RadialMenuGUID;
+                orxU64          m_RadialMenuGUID = orxU64_UNDEFINED;
                 orxFLOAT        m_DockingSpeed;
                 orxBOOL         m_bIsDocking;
                 orxBOOL         m_bIsDocked;
@@ -35,6 +35,7 @@ private:
                 orxBOOL         m_IsDiscovered;
 
                 Starbase*       GetNearestStarBase();
+                void            AdjustRadialMenuToOffset();
 };
 
 #endif // __STARBASE_H__

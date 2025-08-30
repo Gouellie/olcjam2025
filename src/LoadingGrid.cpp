@@ -4,6 +4,7 @@
  */
 
 #include "LoadingGrid.h"
+#include "Vessel.h"
 
 void LoadingGrid::OnCreate()
 {
@@ -32,22 +33,21 @@ void LoadingGrid::OnDelete()
 
 void LoadingGrid::Update(const orxCLOCK_INFO &_rstInfo)
 {
-    orxVECTOR PlayerPos;
-    orxOBJECT* pstVessel;
-    if (pstVessel = orxOBJECT(orxStructure_Get(olcjam2025::GetInstance().GetActiveVesselID())))
+    orxVECTOR cameraPos;
+    if (Vessel* poVessel = (Vessel*)olcjam2025::GetInstance().GetObject(olcjam2025::GetInstance().GetActiveVesselID()))
     {
-        orxObject_GetPosition(pstVessel, &PlayerPos);
+        poVessel->GetCameraPosition(cameraPos);
     }
     else 
     {
-        PlayerPos = orxVECTOR_0;
+        cameraPos = orxVECTOR_0;
     }
 
     // Get cell positions
     orxVECTOR CellPos, PreviousCellPos;
 
-    orxVector_Round(&CellPos, orxVector_Divf(&CellPos, &PlayerPos, m_CellSize));
-    orxVector_Round(&PreviousCellPos, orxVector_Divf(&PreviousCellPos, &m_PreviousPlayerPos, m_CellSize));
+    orxVector_Round(&CellPos, orxVector_Divf(&CellPos, &cameraPos, m_CellSize));
+    orxVector_Round(&PreviousCellPos, orxVector_Divf(&PreviousCellPos, &m_PreviousCameraPos, m_CellSize));
 
     // For all neighboring cells
     for (orxS32 i = -m_LoadingRange; i <= m_LoadingRange; i++)
@@ -96,7 +96,7 @@ void LoadingGrid::Update(const orxCLOCK_INFO &_rstInfo)
     }
 
     // Update previous player position
-    orxVector_Copy(&m_PreviousPlayerPos, &PlayerPos);
+    orxVector_Copy(&m_PreviousCameraPos, &cameraPos);
 }
 
 orxOBJECT* LoadingGrid::GetCellAtPosition(const orxVECTOR& position) const

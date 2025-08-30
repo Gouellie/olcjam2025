@@ -18,6 +18,7 @@ public:
 
                 void            SetIsDocking(orxBOOL isDocking);
                 void            SetIsDocked(orxBOOL isDocked);
+                void            GetCameraPosition(orxVECTOR& position) const;
 
 protected:
 
@@ -52,8 +53,9 @@ private:
 
                 void            MovePlayer(const orxCLOCK_INFO& _rstInfo);
                 orxOBJECT*      GetNearestStarBase();
+                orxOBJECT*      GetPreviousStarBase();
+                orxOBJECT*      GetNextStarBase();
                 void            DrawCompassToObject(orxOBJECT* pos);
-                orxBOOL         GetIsObjectInView(const orxVIEWPORT* _pstViewport, const orxVECTOR& _worldPosition);
                 orxBOOL         GetCompassWorldPositionForViewport(const orxVIEWPORT* _pstViewport, const orxVECTOR& _origin, const orxVECTOR& _dest, orxVECTOR& result);
 };
 

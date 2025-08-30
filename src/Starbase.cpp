@@ -5,6 +5,7 @@
 
 #include "Starbase.h"
 #include "Vessel.h"
+#include "Utils.h"
 
 void Starbase::OnCreate()
 {
@@ -38,13 +39,12 @@ void Starbase::Update(const orxCLOCK_INFO &_rstInfo)
             m_bIsDocking = orxFALSE;
             m_bIsDocked = orxTRUE;
 
-            orxOBJECT* radialMenu = orxObject_CreateFromConfig("RadialMenuStarBase");
-            orxObject_SetOwner(radialMenu, GetOrxObject());
             if (orxOBJECT* pstRadialMenu = orxOBJECT(orxStructure_Get(m_RadialMenuGUID)))
             {
                 orxObject_SetLifeTime(pstRadialMenu, 0);
+                m_RadialMenuGUID = orxU64_UNDEFINED;
             }
-            m_RadialMenuGUID = orxStructure_GetGUID(radialMenu);
+
             m_DockedPosition = vesselPosition;
         }
     }
@@ -52,7 +52,11 @@ void Starbase::Update(const orxCLOCK_INFO &_rstInfo)
     {
         orxVECTOR pos;
         pstVessel->GetPosition(pos);
-        if (!orxVector_AreEqual(&m_DockedPosition, &pos))
+        if (orxVector_AreEqual(&m_DockedPosition, &pos))
+        {
+            AdjustRadialMenuToOffset();
+        }
+        else 
         {
             pstVessel->SetIsDocked(orxFALSE);
             AddTrack("StarbaseShipUndockedTrack");
@@ -62,6 +66,7 @@ void Starbase::Update(const orxCLOCK_INFO &_rstInfo)
             }
 
             m_bIsDocked = orxFALSE;
+            m_RadialMenuGUID = orxU64_UNDEFINED;
         }
     }
 }
@@ -73,5 +78,26 @@ void Starbase::OnCollide(ScrollObject* _poCollider, orxBODY_PART* _pstPart, orxB
         pstVessel->SetIsDocking(orxTRUE);
         m_bIsDocking = orxTRUE;
         AddTrack("StarbaseShipDockingTrack");
+    }
+}
+
+void Starbase::AdjustRadialMenuToOffset()
+{
+    orxVECTOR startBPos, res;
+    GetPosition(startBPos);
+
+    if (ConvertWorldPositionForViewport(orxViewport_Get("MainViewport"), orxViewport_Get("HUDViewport"), startBPos, res)) 
+    {
+        if (m_RadialMenuGUID == orxU64_UNDEFINED)
+        {
+            orxOBJECT* radialMenu = orxObject_CreateFromConfig("RadialMenuStarBase");
+            orxObject_SetOwner(radialMenu, GetOrxObject());
+            m_RadialMenuGUID = orxStructure_GetGUID(radialMenu);
+            orxObject_SetPosition(radialMenu, &res);
+        }
+        else if (orxOBJECT* pstRadialMenu = orxOBJECT(orxStructure_Get(m_RadialMenuGUID)))
+        {
+            orxObject_SetPosition(pstRadialMenu, &res);
+        }
     }
 }

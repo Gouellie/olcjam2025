@@ -32,7 +32,7 @@ private:
                  
                 const orxSTRING m_CellType;
 
-                orxVECTOR       m_PreviousPlayerPos;
+                orxVECTOR       m_PreviousCameraPos;
 };
 
 #endif // __LOADING_GRID_H__
