@@ -30,6 +30,7 @@ void Starbase::Update(const orxCLOCK_INFO &_rstInfo)
 
             if (orxVector_GetDistance(&vesselPosition, &destination) < 1.0f) 
             {
+                AddTrack("StarbaseShipDockedTrack");
                 pstVessel->SetIsDocking(orxFALSE);
                 pstVessel->SetIsDocked(orxTRUE);
                 m_bIsDocking = orxFALSE;
@@ -48,10 +49,13 @@ void Starbase::Update(const orxCLOCK_INFO &_rstInfo)
             if (!orxVector_AreEqual(&m_DockedPosition, &pos))
             {
                 pstVessel->SetIsDocked(orxFALSE);
+                AddTrack("StarbaseShipUndockedTrack");
                 if (orxOBJECT* pstRadialMenu = orxOBJECT(orxStructure_Get(m_RadialMenuGUID)))
                 {
                     orxObject_SetLifeTime(pstRadialMenu, 0);
                 }
+
+                m_bIsDocked = orxFALSE;
             }
         }
     }
@@ -63,5 +67,6 @@ void Starbase::OnCollide(ScrollObject* _poCollider, orxBODY_PART* _pstPart, orxB
     {
         pstVessel->SetIsDocking(orxTRUE);
         m_bIsDocking = orxTRUE;
+        AddTrack("StarbaseShipDockingTrack");
     }
 }

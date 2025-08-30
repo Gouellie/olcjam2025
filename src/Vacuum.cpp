@@ -123,7 +123,7 @@ void VacuumHead::OnCollide(ScrollObject* _poCollider, orxBODY_PART* _pstPart, or
         orxConfig_SetS32(_poCollider->GetName(), tally + 1);
         orxConfig_PopSection();
 
-        AddFX("VacuumBlowFX");
+        AddTrack("VacuumBlowShapeTrack");
 
         _poCollider->SetLifeTime(0);
     }

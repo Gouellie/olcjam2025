@@ -74,18 +74,38 @@ void Vessel::MovePlayer(const orxCLOCK_INFO& _rstInfo)
     // Update player position
     orxVECTOR PlayerMove, PlayerPos, PlayerSpeed;
 
-    orxVector_Mulf(&PlayerMove,
-        orxVector_Mul(&PlayerMove,
-            orxVector_Set(&PlayerMove,
-                orxInput_GetValue("Right") - orxInput_GetValue("Left"),
-                orxInput_GetValue("Down") - orxInput_GetValue("Up"),
-                orxFLOAT_0),
-            orxVector_Lerp(&PlayerSpeed, &m_vPlayerSpeed, &m_vPlayerHighSpeed, orxInput_GetValue("Fast"))),
-        _rstInfo.fDT);
+    orxVector_Set(&PlayerMove,
+        orxInput_GetValue("Right") - orxInput_GetValue("Left"),
+        orxInput_GetValue("Down") - orxInput_GetValue("Up"),
+        orxFLOAT_0);
 
-    orxObject_SetPosition(GetOrxObject(), orxVector_Add(&PlayerPos,
-        orxObject_GetPosition(GetOrxObject(), &PlayerPos),
-        orxVector_Round(&PlayerMove, &PlayerMove)));
+    if (orxVector_AreEqual(&PlayerMove, &orxVECTOR_0))
+    {
+        if (m_IsMoving) 
+        {
+            AddTrack("VesselMovingStopTrack");
+        }
+        m_IsMoving = orxFALSE;
+    }
+    else 
+    {
+        orxVector_Normalize(&PlayerMove, &PlayerMove);
+
+        orxVector_Mulf(&PlayerMove,
+            orxVector_Mul(&PlayerMove, &PlayerMove, orxVector_Lerp(&PlayerSpeed, &m_vPlayerSpeed, &m_vPlayerHighSpeed, orxInput_GetValue("Fast"))),
+            _rstInfo.fDT);
+
+        orxObject_SetPosition(GetOrxObject(), orxVector_Add(&PlayerPos,
+            orxObject_GetPosition(GetOrxObject(), &PlayerPos),
+            orxVector_Round(&PlayerMove, &PlayerMove)));
+
+        if (!m_IsMoving)
+        {
+            AddTrack("VesselMovingStartTrack");
+        }
+
+        m_IsMoving = orxTRUE;
+    }
 }
 
 void Vessel::SetIsDocking(orxBOOL isDocking)

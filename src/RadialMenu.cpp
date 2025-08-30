@@ -49,7 +49,7 @@ void RadialMenu::Update(const orxCLOCK_INFO &_rstInfo)
         {
             if (m_pstSelectionFocus != pstObject)
             {
-                orxObject_AddFX(pstObject, "RadialMenuOptionFocused");
+                button->AddTrack("RadialMenuOptionFocusedTrack");
                 m_pstSelectionFocusLabel = orxObject_CreateFromConfig(button->GetLabelName());
                 orxObject_SetParent(m_pstSelectionFocusLabel, GetOrxObject());
                 orxObject_SetOwner(m_pstSelectionFocusLabel, GetOrxObject());
@@ -60,6 +60,7 @@ void RadialMenu::Update(const orxCLOCK_INFO &_rstInfo)
                 if (orxInput_HasBeenActivated("Activate"))
                 {
                     orxInput_SetValue(button->GetInputName(), orxFLOAT_1);
+                    button->AddTrack("RadialMenuOptionActivateTrack");
                 }
             }
             else if (orxInput_IsActive("Activate"))
@@ -70,8 +71,11 @@ void RadialMenu::Update(const orxCLOCK_INFO &_rstInfo)
     }
     else if (m_pstSelectionFocus != orxNULL) 
     {
-        orxObject_AddFX(m_pstSelectionFocus, "RadialMenuOptionUnfocused");
-        orxObject_SetLifeTime(m_pstSelectionFocusLabel, orxFLOAT_0);
+        if (RadialMenuOption* button = (RadialMenuOption*)olcjam2025::GetInstance().GetObject(orxStructure_GetGUID(m_pstSelectionFocus)))
+        {
+            button->AddTrack("RadialMenuOptionUnfocusedTrack");
+            orxObject_SetLifeTime(m_pstSelectionFocusLabel, orxFLOAT_0);
+        }
     }
 
     m_pstSelectionFocus = pstObject;

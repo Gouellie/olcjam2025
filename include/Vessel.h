@@ -45,6 +45,8 @@ private:
                 orxFLOAT        m_ShapesImpulseMultiplier;
                 orxU16          m_ShapesCollisionFlag;
 
+                orxBOOL         m_IsMoving;
+
 private:
 
                 void            MovePlayer(const orxCLOCK_INFO& _rstInfo);
