@@ -9,3 +9,4 @@ bin/imgui.ini
 /.vscode
 /data/texture/tmp
 /data/sound/Temp
+*.wav
