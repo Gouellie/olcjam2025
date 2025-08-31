@@ -189,6 +189,11 @@ void VacuumHead::FireShape()
         poShape->SetPosition(pos, orxTRUE);
         poShape->Enable(orxTRUE);
 
+        orxConfig_PushSection("Tally");
+        orxS32 tally = orxConfig_GetS32(poShape->GetName());
+        orxConfig_SetS32(poShape->GetName(), tally - 1);
+        orxConfig_PopSection();
+
         orxFLOAT rotation = GetRotation(orxTRUE);
 
         orxVector_Copy(&impulse, &orxVECTOR_Y);
