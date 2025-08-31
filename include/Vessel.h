@@ -44,6 +44,7 @@ private:
 
                 orxU64          m_VacuumGUID;
                 orxU64          m_GaugeBoostGUID;
+                orxU64          m_GaugeReturnToBaseGUID = orxU64_UNDEFINED;
 
                 orxFLOAT        m_ShapesImpulseMultiplier;
                 orxU16          m_ShapesCollisionFlag;
@@ -52,6 +53,7 @@ private:
 
 private:
 
+                orxBOOL         IsPlayerReturningToBase(const orxCLOCK_INFO& _rstInfo);
                 void            MovePlayer(const orxCLOCK_INFO& _rstInfo);
                 orxOBJECT*      GetNearestStarBase();
                 orxOBJECT*      GetPreviousStarBase();

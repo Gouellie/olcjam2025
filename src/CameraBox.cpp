@@ -3,6 +3,8 @@
 #include <math/orxMath.h>
 #include <math/orxVector.h>
 
+#include "Gauge.h"
+
 void CameraBox::SetTarget(ScrollObject* target)
 {
     m_Target = target;
@@ -96,6 +98,13 @@ orxBOOL CameraBox::GetBeamActive() const
     if (m_VacuumLocked) 
     {
         return orxFALSE;
+    }
+    if (Gauge* shapeGauge = (Gauge*)olcjam2025::GetInstance().GetObject("Runtime", "GaugeShapes")) 
+    {
+        if (shapeGauge->GetIsMaxedOut()) 
+        {
+            return orxFALSE;
+        }
     }
 
     return orxInput_IsActive("Vacuum");

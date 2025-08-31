@@ -57,7 +57,10 @@ void Vessel::Update(const orxCLOCK_INFO &_rstInfo)
 {
     if (m_IsDocking == false) 
     {
-        MovePlayer(_rstInfo);
+        if (IsPlayerReturningToBase(_rstInfo) == orxFALSE)
+        {
+            MovePlayer(_rstInfo);
+        }
 
         if (orxOBJECT* pstNearest = GetNearestStarBase()) 
         {
@@ -100,20 +103,53 @@ void Vessel::Update(const orxCLOCK_INFO &_rstInfo)
                 orxObject_AddTimeLineTrack(m_Camera, "ZoomIn");
             }
         }
-
-        if (orxInput_HasBeenActivated("ReturnToStarBase"))
-        {
-            orxOBJECT* sb = GetNearestStarBase();
-            if (sb != orxNULL)
-            {
-                orxVECTOR pos;
-                orxObject_GetWorldPosition(sb, &pos);
-                SetPosition(pos, orxTRUE);
-            }
-        }
     }
 
     m_CameraBox.Update(_rstInfo);
+}
+
+
+
+orxBOOL Vessel::IsPlayerReturningToBase(const orxCLOCK_INFO& _rstInfo)
+{
+    Gauge* poGauge = (Gauge*)olcjam2025::GetInstance().GetObject(m_GaugeReturnToBaseGUID);
+
+    if (orxInput_HasBeenActivated("ReturnToStarBase"))
+    {
+        orxOBJECT* gauge = orxObject_CreateFromConfig("GaugeReturnToBase");
+        m_GaugeReturnToBaseGUID = orxStructure_GetGUID(gauge);
+        return orxTRUE;
+    }
+    else if (orxInput_IsActive("ReturnToStarBase"))
+    {
+        if (poGauge) 
+        {
+            poGauge->Refill(_rstInfo);
+
+            if (poGauge->GetIsMaxedOut())
+            {
+                poGauge->SetLifeTime(orxFLOAT_0);
+                m_GaugeReturnToBaseGUID = orxU64_UNDEFINED;
+
+                orxOBJECT* sb = GetNearestStarBase();
+                if (sb != orxNULL)
+                {
+                    orxVECTOR pos;
+                    orxObject_GetWorldPosition(sb, &pos);
+                    SetPosition(pos, orxTRUE);
+                }
+            }
+        }
+
+        return orxTRUE;
+    }
+    else if (poGauge) 
+    {
+        poGauge->SetLifeTime(orxFLOAT_0);
+        m_GaugeReturnToBaseGUID = orxU64_UNDEFINED;
+    }
+
+    return orxFALSE;
 }
 
 void Vessel::MovePlayer(const orxCLOCK_INFO& _rstInfo)

@@ -62,17 +62,30 @@ void Vacuum::Update(const orxCLOCK_INFO &_rstInfo)
     SetRotation(lerp_angle(GetRotation(), m_DesiredRotation, _rstInfo.fDT * m_RotationSpeed));
 
     Gauge* poGaugeBoost = (Gauge*)olcjam2025::GetInstance().GetObject(m_GaugeShapesGUID);
-    if (poGaugeBoost->GetIsMaxedOut()) 
+
+    if (!m_IsBeamLocked && orxInput_HasBeenActivated("Vacuum"))
     {
-        SetIsBeamActive(orxFALSE);
-    }
-    else if (!m_IsBeamLocked && orxInput_HasBeenActivated("Vacuum"))
-    {
-        SetIsBeamActive(orxTRUE);
+        if (poGaugeBoost->GetIsMaxedOut())
+        {
+            poGaugeBoost->AddTrack("GaugeShapesIsFullTrack");
+            SetIsBeamActive(orxFALSE);
+        }
+        else 
+        {
+            SetIsBeamActive(orxTRUE);
+        }
     }
     else if (orxInput_HasBeenDeactivated("Vacuum"))
     {
         SetIsBeamActive(orxFALSE);
+    }
+    else if (poGaugeBoost->GetIsMaxedOut())
+    {
+        if (m_IsBeamActive) 
+        {
+            poGaugeBoost->AddTrack("GaugeShapesIsFullTrack");
+            SetIsBeamActive(orxFALSE);
+        }
     }
 }
 
@@ -109,6 +122,8 @@ void Vacuum::SetIsBeamActive(orxBOOL isBeamActive)
             orxObject_SetLifeTime(vacuumBeam, orxFLOAT_0);
         }
     }
+
+    m_IsBeamActive = isBeamActive;
 }
 
 void VacuumHead::OnCreate()

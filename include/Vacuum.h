@@ -27,6 +27,7 @@ protected:
 
 private:
 
+    orxBOOL         m_IsBeamActive;
     orxBOOL         m_IsBeamLocked;
     orxFLOAT        m_DesiredRotation = orxFLOAT_0;
     orxFLOAT        m_RotationSpeed;
