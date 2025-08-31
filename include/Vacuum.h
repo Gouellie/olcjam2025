@@ -33,6 +33,8 @@ private:
     orxU64          m_vacuumHeadGUID;
     orxU64          m_vacuumBeamGUID;
 
+    orxU64          m_GaugeShapesGUID;
+
     void            SetIsBeamActive(orxBOOL isBeamActive);
 };
 
@@ -55,6 +57,8 @@ private:
     orxFLOAT        m_WaitForFire;
     orxFLOAT        m_FireDelay;
     orxFLOAT        m_FireSpeed;
+
+    orxU64          m_GaugeShapesGUID;
 
     std::stack<orxU64> m_collection;
 };

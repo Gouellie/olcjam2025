@@ -4,10 +4,14 @@
  */
 
 #include "Vacuum.h"
+#include "Gauge.h"
 #include "MoreMath.h"
 
 void Vacuum::OnCreate()
 {
+    Gauge* poGaugeBoost = (Gauge*)olcjam2025::GetInstance().GetObject("Runtime", "GaugeShapes");
+    m_GaugeShapesGUID = poGaugeBoost->GetGUID();
+
     m_RotationSpeed = orxConfig_GetFloat("RotationSpeed");
 
     for (orxOBJECT* pstChild = orxObject_GetOwnedChild(GetOrxObject());
@@ -57,7 +61,12 @@ void Vacuum::Update(const orxCLOCK_INFO &_rstInfo)
 
     SetRotation(lerp_angle(GetRotation(), m_DesiredRotation, _rstInfo.fDT * m_RotationSpeed));
 
-    if (!m_IsBeamLocked && orxInput_HasBeenActivated("Vacuum"))
+    Gauge* poGaugeBoost = (Gauge*)olcjam2025::GetInstance().GetObject(m_GaugeShapesGUID);
+    if (poGaugeBoost->GetIsMaxedOut()) 
+    {
+        SetIsBeamActive(orxFALSE);
+    }
+    else if (!m_IsBeamLocked && orxInput_HasBeenActivated("Vacuum"))
     {
         SetIsBeamActive(orxTRUE);
     }
@@ -104,6 +113,9 @@ void Vacuum::SetIsBeamActive(orxBOOL isBeamActive)
 
 void VacuumHead::OnCreate()
 {
+    Gauge* poGaugeBoost = (Gauge*)olcjam2025::GetInstance().GetObject("Runtime", "GaugeShapes");
+    m_GaugeShapesGUID = poGaugeBoost->GetGUID();
+
     m_WaitForFire = orxConfig_GetFloat("WaitForFire");
     m_FireSpeed   = orxConfig_GetFloat("FireSpeed");
 }
@@ -148,6 +160,9 @@ void VacuumHead::FireShape()
     orxU64 shapeID = m_collection.top();
     m_collection.pop();
 
+    Gauge* poGaugeBoost = (Gauge*)olcjam2025::GetInstance().GetObject(m_GaugeShapesGUID);
+    poGaugeBoost->SetCurrentValue(m_collection.size());
+
     orxVECTOR pos, impulse;
 
     if (ScrollObject* poShape = olcjam2025::GetInstance().GetObject(shapeID)) 
@@ -179,6 +194,9 @@ void VacuumHead::OnCollide(ScrollObject* _poCollider, orxBODY_PART* _pstPart, or
         orxConfig_PopSection();
 
         AddTrack("VacuumBlowShapeTrack");
+
+        Gauge* poGaugeBoost = (Gauge*)olcjam2025::GetInstance().GetObject(m_GaugeShapesGUID);
+        poGaugeBoost->SetCurrentValue(poGaugeBoost->GetCurrentValue() + 1.0f);
 
         m_collection.push(_poCollider->GetGUID());
         _poCollider->Enable(orxFALSE);
