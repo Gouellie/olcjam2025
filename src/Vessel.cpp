@@ -125,21 +125,19 @@ void Vessel::Update(const orxCLOCK_INFO &_rstInfo)
                 }
             }
         }
-        else if (!m_IsInsideShield)
-        {
-            // Zoom Out?
-            if (orxInput_HasBeenActivated("Zoom"))
-            {
-                m_IsZooming = orxTRUE;
-                orxObject_AddTimeLineTrack(m_Camera, "ZoomOut");
-            }
-            // Zoom In?
-            else if (orxInput_HasBeenDeactivated("Zoom"))
-            {
-                m_IsZooming = orxFALSE;
-                orxObject_AddTimeLineTrack(m_Camera, "ZoomIn");
-            }
-        }
+    }
+
+    // Zoom Out?
+    if (orxInput_HasBeenActivated("Zoom"))
+    {
+        m_IsZooming = orxTRUE;
+        orxObject_AddTimeLineTrack(m_Camera, "ZoomOut");
+    }
+    // Zoom In?
+    else if (orxInput_HasBeenDeactivated("Zoom"))
+    {
+        m_IsZooming = orxFALSE;
+        orxObject_AddTimeLineTrack(m_Camera, "ZoomIn");
     }
 
     m_CameraBox.Update(_rstInfo);
@@ -250,11 +248,6 @@ void Vessel::SetIsInsideStarbaseShield(orxBOOL value)
         pstVacuum->Enable(~value, orxTRUE);
         m_CameraBox.SetIsVacuumLocked(value);
     }
-    if (value && m_IsZooming)
-    {
-        orxObject_AddTimeLineTrack(m_Camera, "ZoomIn");
-        m_IsZooming = orxFALSE;
-    }
 
     Gauge* poGaugeHealth = (Gauge*)olcjam2025::GetInstance().GetObject(m_GaugeHealthGUID);
     poGaugeHealth->SetAutoRefill(value);
@@ -263,12 +256,14 @@ void Vessel::SetIsInsideStarbaseShield(orxBOOL value)
 }
 
 
-void Vessel::SetIsDocked(orxBOOL isDocked) const
+void Vessel::SetIsDocked(orxBOOL isDocked)
 {
     if (Vacuum* pstVacuum = (Vacuum*)olcjam2025::GetInstance().GetObject(m_VacuumGUID))
     {
         pstVacuum->SetIsVesselDocked(isDocked);
     }
+
+    m_IsDocked = isDocked;
 }
 
 

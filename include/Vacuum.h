@@ -62,6 +62,9 @@ private:
     orxFLOAT        m_FireDelay;
     orxFLOAT        m_FireSpeed;
 
+    orxFLOAT        m_DepositDelay;
+    orxFLOAT        m_WaitForDeposit;
+
     orxU64          m_GaugeShapesGUID;
     orxU64          m_GaugeHealthGUID;
 
