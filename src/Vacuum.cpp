@@ -104,6 +104,8 @@ void Vacuum::SetIsBeamActive(orxBOOL isBeamActive)
 
 void VacuumHead::OnCreate()
 {
+    m_WaitForFire = orxConfig_GetFloat("WaitForFire");
+    m_FireSpeed   = orxConfig_GetFloat("FireSpeed");
 }
 
 void VacuumHead::OnDelete()
@@ -112,7 +114,60 @@ void VacuumHead::OnDelete()
 
 void VacuumHead::Update(const orxCLOCK_INFO& _rstInfo)
 {
+    Vacuum* parent = (Vacuum*)GetParent();
+    if (parent->GetIsBeamLocked())
+    {
+        return;
+    }
+
+    if (orxInput_IsActive("Fire"))
+    {
+        if (CanFireShape(_rstInfo)) 
+        {
+            FireShape();
+        }
+    }
 }
+
+orxBOOL VacuumHead::CanFireShape(const orxCLOCK_INFO& _rstInfo)
+{
+    m_FireDelay = orxMAX(orxFLOAT_0, m_FireDelay - _rstInfo.fDT);
+    return m_FireDelay == orxFLOAT_0;
+}
+
+void VacuumHead::FireShape()
+{
+    m_FireDelay = m_WaitForFire;
+
+    if (m_collection.empty())
+    {
+        AddTrack("VacuumFireShapeShootingBlankTrack");
+        return;
+    }
+
+    orxU64 shapeID = m_collection.top();
+    m_collection.pop();
+
+    orxVECTOR pos, impulse;
+
+    if (ScrollObject* poShape = olcjam2025::GetInstance().GetObject(shapeID)) 
+    {
+        GetOwnedChild()->GetPosition(pos, orxTRUE);
+
+        poShape->SetPosition(pos, orxTRUE);
+        poShape->Enable(orxTRUE);
+
+        orxFLOAT rotation = GetRotation(orxTRUE);
+
+        orxVector_Copy(&impulse, &orxVECTOR_Y);
+        orxVector_Mulf(&impulse, &impulse, m_FireSpeed);
+        orxVector_2DRotate(&impulse, &impulse, rotation);
+        orxObject_SetSpeed(poShape->GetOrxObject(), &impulse);
+
+        AddTrack("VacuumFireShapeTrack");
+    }
+}
+
 
 void VacuumHead::OnCollide(ScrollObject* _poCollider, orxBODY_PART* _pstPart, orxBODY_PART* _pstColliderPart, const orxVECTOR& _rvPosition, const orxVECTOR& _rvNormal)
 {
@@ -125,6 +180,9 @@ void VacuumHead::OnCollide(ScrollObject* _poCollider, orxBODY_PART* _pstPart, or
 
         AddTrack("VacuumBlowShapeTrack");
 
-        _poCollider->SetLifeTime(0);
+        m_collection.push(_poCollider->GetGUID());
+        _poCollider->Enable(orxFALSE);
     }
 }
+
+

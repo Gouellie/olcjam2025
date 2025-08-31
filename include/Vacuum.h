@@ -6,6 +6,8 @@
 #ifndef __VACUUM_H__
 #define __VACUUM_H__
 
+#include <stack>
+
 #include "olcjam2025.h"
 
  /** Vacuum Class
@@ -14,6 +16,7 @@ class Vacuum : public ScrollObject
 {
 public:
 
+    orxBOOL         GetIsBeamLocked() const { return m_IsBeamLocked; }
     void            SetIsBeamLocked(orxBOOL isBeamLocked);
 
 protected:
@@ -46,7 +49,14 @@ protected:
     void            OnCollide(ScrollObject* _poCollider, orxBODY_PART* _pstPart, orxBODY_PART* _pstColliderPart, const orxVECTOR& _rvPosition, const orxVECTOR& _rvNormal);
 
 private:
+    orxBOOL         CanFireShape(const orxCLOCK_INFO& _rstInfo);
+    void            FireShape();
 
+    orxFLOAT        m_WaitForFire;
+    orxFLOAT        m_FireDelay;
+    orxFLOAT        m_FireSpeed;
+
+    std::stack<orxU64> m_collection;
 };
 
 #endif // __VACUUM_H__
