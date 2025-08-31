@@ -73,7 +73,7 @@ void Starbase::Update(const orxCLOCK_INFO &_rstInfo)
 
 void Starbase::OnCollide(ScrollObject* _poCollider, orxBODY_PART* _pstPart, orxBODY_PART* _pstColliderPart, const orxVECTOR& _rvPosition, const orxVECTOR& _rvNormal)
 {
-    if (Vessel* pstVessel = (Vessel*)_poCollider) 
+    if (Vessel* pstVessel = (Vessel*)_poCollider)
     {
         pstVessel->SetIsDocking(orxTRUE);
         m_bIsDocking = orxTRUE;
