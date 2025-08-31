@@ -8,6 +8,7 @@
 #undef __SCROLL_IMPL__
 
 #include "Object.h"
+#include "Gauge.h"
 #include "LoadingGrid.h"
 #include "RadialMenu.h"
 #include "Shape.h"
@@ -206,6 +207,7 @@ void olcjam2025::Exit()
 void olcjam2025::BindObjects()
 {
   BindObject(Object);
+  BindObject(Gauge);
   BindObject(LoadingGrid);
   BindObject(RadialMenu);
   BindObject(RadialMenuOption);
@@ -215,7 +217,6 @@ void olcjam2025::BindObjects()
   BindObject(VacuumHead);
   BindObject(VacuumBeam);
   BindObject(Vessel);
-  BindObject(orxContainerObject);
 }
 
 /** Bootstrap function, it is called before config is initialized, allowing for early resource storage definitions

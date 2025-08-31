@@ -19,10 +19,6 @@
 #include "orxInspector.h"
 #undef orxINSPECTOR_IMPL
 
-#define orxCONTAINER_IMPL
-#include "container/orxContainer.h"
-#undef orxCONTAINER_IMPL
-
 #define orxBUNDLE_IMPL
 #include "orxBundle.h"
 #undef orxBUNDLE_IMPL
@@ -37,9 +33,6 @@ void InitExtensions()
 
   // Initialize inspector
   orxInspector_Init();
-
-  // Initialize container
-  orxContainer_Init();
 }
 
 void ExitExtensions()
@@ -55,9 +48,6 @@ void ExitExtensions()
 
   // Exit from bundle support
   orxBundle_Exit();
-
-  // Exit from container
-  orxContainer_Exit();
 }
 
 void BootstrapExtensions()
