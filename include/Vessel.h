@@ -38,6 +38,9 @@ private:
                 orxVECTOR       m_vPlayerSpeed;
                 orxVECTOR       m_vPlayerHighSpeed;
 
+                orxBOOL         m_IsInvincible;
+                orxFLOAT        m_TimeAlive;
+
                 orxBOOL         m_IsZooming;
                 orxBOOL         m_IsDocking;
                 orxBOOL         m_IsDocked;
@@ -45,6 +48,7 @@ private:
 
                 orxU64          m_VacuumGUID;
                 orxU64          m_GaugeBoostGUID;
+                orxU64          m_GaugeHealthGUID;
                 orxU64          m_GaugeReturnToBaseGUID = orxU64_UNDEFINED;
 
                 orxFLOAT        m_ShapesImpulseMultiplier;
@@ -52,6 +56,7 @@ private:
                 orxU16          m_StarbaseShieldCollisionFlag;
 
                 orxBOOL         m_IsMoving;
+                orxBOOL         m_GameOver;
 
 private:
 

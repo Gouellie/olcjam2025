@@ -6,11 +6,16 @@
 #include "Vacuum.h"
 #include "Gauge.h"
 #include "MoreMath.h"
+#include "Shape.h"
 
 void Vacuum::OnCreate()
 {
     Gauge* poGaugeBoost = (Gauge*)olcjam2025::GetInstance().GetObject("Runtime", "GaugeShapes");
     m_GaugeShapesGUID = poGaugeBoost->GetGUID();
+
+    Gauge* poGaugeHealth = (Gauge*)olcjam2025::GetInstance().GetObject("Runtime", "GaugeHealth");
+    m_GaugeHealthGUID = poGaugeHealth->GetGUID();
+
 
     m_RotationSpeed = orxConfig_GetFloat("RotationSpeed");
 
@@ -33,6 +38,16 @@ void Vacuum::OnDelete()
 void Vacuum::Update(const orxCLOCK_INFO &_rstInfo)
 {
     orxVECTOR VacuumHead;
+
+    Gauge* poGaugeHealth = (Gauge*)olcjam2025::GetInstance().GetObject(m_GaugeHealthGUID);
+    if (poGaugeHealth->GetIsDepleted())
+    {
+        if (m_IsBeamActive)
+        {
+            SetIsBeamActive(orxFALSE);
+        }
+        return;
+    }
 
     if (olcjam2025::GetInstance().GetIsUsingPad())
     {
@@ -143,6 +158,9 @@ void VacuumHead::OnCreate()
     Gauge* poGaugeBoost = (Gauge*)olcjam2025::GetInstance().GetObject("Runtime", "GaugeShapes");
     m_GaugeShapesGUID = poGaugeBoost->GetGUID();
 
+    Gauge* poGaugeHealth = (Gauge*)olcjam2025::GetInstance().GetObject("Runtime", "GaugeHealth");
+    m_GaugeHealthGUID = poGaugeHealth->GetGUID();
+
     m_WaitForFire = orxConfig_GetFloat("WaitForFire");
     m_FireSpeed   = orxConfig_GetFloat("FireSpeed");
 }
@@ -229,11 +247,23 @@ void VacuumHead::OnCollide(ScrollObject* _poCollider, orxBODY_PART* _pstPart, or
 
         AddTrack("VacuumBlowShapeTrack");
 
-        Gauge* poGaugeBoost = (Gauge*)olcjam2025::GetInstance().GetObject(m_GaugeShapesGUID);
-        poGaugeBoost->SetCurrentValue(poGaugeBoost->GetCurrentValue() + 1.0f);
+        if (orxString_SearchString(_poCollider->GetName(), "Negative"))
+        {
+            ScrollObject* poVessel = olcjam2025::GetInstance().GetObject(olcjam2025::GetInstance().GetActiveVesselID());
+            poVessel->AddTrack("VesselDamageBlowTrack");
+            _poCollider->SetLifeTime(orxFLOAT_0);
 
-        m_collection.push(_poCollider->GetGUID());
-        _poCollider->Enable(orxFALSE);
+            Gauge* poGaugeHealth = (Gauge*)olcjam2025::GetInstance().GetObject(m_GaugeHealthGUID);
+            poGaugeHealth->Decrement(((Shape*)_poCollider)->GetShapeDamageBlow());
+        }
+        else 
+        {
+            Gauge* poGaugeShapes = (Gauge*)olcjam2025::GetInstance().GetObject(m_GaugeShapesGUID);
+            poGaugeShapes->SetCurrentValue(poGaugeShapes->GetCurrentValue() + 1.0f);
+
+            m_collection.push(_poCollider->GetGUID());
+            _poCollider->Enable(orxFALSE);
+        }
     }
 }
 

@@ -11,6 +11,7 @@ void VacuumBeam::OnCreate()
     m_collidingIDs.reserve(10);
     m_vacuumStrength = orxConfig_GetFloat("Strength");
     m_vacuumDistanceMultiplier = orxConfig_GetFloat("DistanceMult");
+    m_vacuumStrengthMultiplierNegativeShapes = orxConfig_GetFloat("StrengthMultiplierNegativeShapes");
 }
 
 void VacuumBeam::OnDelete()
@@ -40,7 +41,12 @@ void VacuumBeam::Update(const orxCLOCK_INFO &_rstInfo)
 
             const orxFLOAT distanceToOrigin = orxVector_GetDistance(&vVacuumOrigin, &vColliderPosition);
 
-            const orxFLOAT strengthMultiplier = orxMath_Pow(2, orxREMAP(orxFLOAT_0, orxFLOAT_1, m_vacuumDistanceMultiplier, orxFLOAT_1, orxMath_SmootherStep(vSize.fY / 2.0f, vSize.fY * 3.0f, distanceToOrigin)));
+            orxFLOAT strengthMultiplier = orxMath_Pow(2, orxREMAP(orxFLOAT_0, orxFLOAT_1, m_vacuumDistanceMultiplier, orxFLOAT_1, orxMath_SmootherStep(vSize.fY / 2.0f, vSize.fY * 3.0f, distanceToOrigin)));
+
+            if (orxString_SearchString(orxObject_GetName(collider), "Negative"))
+            {
+                strengthMultiplier *= m_vacuumStrengthMultiplierNegativeShapes;
+            }
 
             orxVector_Normalize(&vDirection, &vDirection);
 

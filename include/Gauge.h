@@ -15,6 +15,7 @@ class Gauge : public ScrollObject
 public:
 
                 orxBOOL             GetIsMaxedOut() const { return m_CurrentValue == m_GaugeMax; }
+                orxBOOL             GetIsDepleted() const { return m_CurrentValue <= orxFLOAT_0; }
                 void                SetGaugeMax(orxFLOAT gaugeMax) { m_GaugeMax = gaugeMax; }
                 void                SetDepletionTime(orxFLOAT depletionTime) { m_DepletionTime = depletionTime; }
                 void                SetRefillTime(orxFLOAT refillTime) { m_RefillTime = refillTime; }
@@ -29,6 +30,7 @@ public:
                 void                RefillToMax() { m_CurrentValue = m_GaugeMax; }
                 orxFLOAT            Deplete(const orxCLOCK_INFO& _rstInfo);
                 orxFLOAT            Refill(const orxCLOCK_INFO& _rstInfo);
+                void                Decrement(orxFLOAT amount);
 
 protected:
 

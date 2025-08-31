@@ -7,6 +7,7 @@
 #include "Vacuum.h"
 #include "Gauge.h"
 #include "Starbase.h"
+#include "Shape.h"
 #include "MoreMath.h"
 #include "Utils.h"
 
@@ -48,6 +49,11 @@ void Vessel::OnCreate()
 
     Gauge* poGaugeBoost = (Gauge*)olcjam2025::GetInstance().GetObject("Runtime", "GaugeBoost");
     m_GaugeBoostGUID = poGaugeBoost->GetGUID();
+
+    Gauge* poGaugeHealth = (Gauge*)olcjam2025::GetInstance().GetObject("Runtime", "GaugeHealth");
+    m_GaugeHealthGUID = poGaugeHealth->GetGUID();
+
+    m_IsInvincible = orxTRUE;
 }
 
 void Vessel::OnDelete()
@@ -56,6 +62,36 @@ void Vessel::OnDelete()
 
 void Vessel::Update(const orxCLOCK_INFO &_rstInfo)
 {
+    if (m_IsInvincible) 
+    {
+        m_TimeAlive += _rstInfo.fDT;
+        if (m_TimeAlive < orxFLOAT(0.2f)) 
+        {
+            if (orxOBJECT* pstNearest = GetNearestStarBase())
+            {
+                DrawCompassToObject(pstNearest);
+            }
+            return;
+        }
+        m_IsInvincible = orxFALSE;
+    }
+    
+    Gauge* poGaugeHealth = (Gauge*)olcjam2025::GetInstance().GetObject(m_GaugeHealthGUID);
+    if (poGaugeHealth->GetIsDepleted()) 
+    {
+        if (!m_GameOver) 
+        {
+            orxObject_CreateFromConfig("GameOver");
+            m_GameOver = orxTRUE;
+        }
+        if (m_IsMoving)
+        {
+            AddTrack("VesselMovingStopTrack");
+            m_IsMoving = orxFALSE;
+        }
+        return;
+    }
+
     if (m_IsDocking == false) 
     {
         if (IsPlayerReturningToBase(_rstInfo) == orxFALSE)
@@ -220,6 +256,9 @@ void Vessel::SetIsInsideStarbaseShield(orxBOOL value)
         m_IsZooming = orxFALSE;
     }
 
+    Gauge* poGaugeHealth = (Gauge*)olcjam2025::GetInstance().GetObject(m_GaugeHealthGUID);
+    poGaugeHealth->SetAutoRefill(value);
+
     m_IsInsideShield = value;
 }
 
@@ -242,12 +281,33 @@ void Vessel::OnCollide(ScrollObject* _poCollider, orxBODY_PART* _pstPart, orxBOD
 {
     if (orxBody_GetPartSelfFlags(_pstColliderPart) == m_ShapesCollisionFlag) 
     {
-        orxVECTOR impulse;
-        orxVector_Neg(&impulse, &_rvNormal);
-        orxVector_Mulf(&impulse, &impulse, m_ShapesImpulseMultiplier);
-        orxBody_ApplyImpulse(orxBody_GetPartBody(_pstColliderPart), &impulse, &_rvPosition);
+        if (orxString_SearchString(_poCollider->GetName(), "Negative"))
+        {
+            if (m_IsInvincible) 
+            {
+                _poCollider->SetLifeTime(orxFLOAT_0);
+            }
+            else 
+            {
+                AddTrack("VesselDamageBounceTrack");
+                orxBody_RemovePart(_pstColliderPart);
+                _poCollider->AddTrack("NegativeShapeCollisionTrack");
+                Gauge* poGaugeHealth = (Gauge*)olcjam2025::GetInstance().GetObject(m_GaugeHealthGUID);
+                poGaugeHealth->Decrement(((Shape*)_poCollider)->GetShapeDamageBounce());
+            }
+        }
+        else 
+        {
+            if (!m_IsInvincible)
+            {
+                orxVECTOR impulse;
+                orxVector_Neg(&impulse, &_rvNormal);
+                orxVector_Mulf(&impulse, &impulse, m_ShapesImpulseMultiplier);
+                orxBody_ApplyImpulse(orxBody_GetPartBody(_pstColliderPart), &impulse, &_rvPosition);
 
-        AddSound("Sound_BounceFromShip");
+                AddSound("Sound_BounceFromShip");
+            }
+        }
     }
     if (orxBody_GetPartSelfFlags(_pstColliderPart) == m_StarbaseShieldCollisionFlag)
     {

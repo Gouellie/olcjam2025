@@ -114,3 +114,8 @@ orxFLOAT Gauge::Refill(const orxCLOCK_INFO& _rstInfo)
 
     return m_CurrentValue;
 }
+
+void Gauge::Decrement(orxFLOAT amount)
+{
+    m_CurrentValue = orxMIN(orxMAX(orxFLOAT_0, m_CurrentValue - amount), m_GaugeMax);
+}

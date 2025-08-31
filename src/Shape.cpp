@@ -8,6 +8,8 @@
 
 void Shape::OnCreate()
 {
+    m_ShapeDamageBlow = orxConfig_GetFloat("DamageBlow");
+    m_ShapeDamageBounce = orxConfig_GetFloat("DamageBounce");
     GetScale(m_vOriginalScale);
     GetSpeed(m_vPreviousSpeed);
 }

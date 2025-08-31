@@ -29,6 +29,7 @@ private:
                 std::vector<orxU64>                m_collidingIDs;
                 orxFLOAT                           m_vacuumStrength;
                 orxFLOAT                           m_vacuumDistanceMultiplier;
+                orxFLOAT                           m_vacuumStrengthMultiplierNegativeShapes;
 };
 
 #endif // __VACUUM_BEAM_H__

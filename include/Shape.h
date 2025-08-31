@@ -14,6 +14,8 @@ class Shape : public ScrollObject
 {
 public:
 
+                orxFLOAT        GetShapeDamageBlow() const { return m_ShapeDamageBlow; }
+                orxFLOAT        GetShapeDamageBounce() const { return m_ShapeDamageBounce; }
                 void            SetIsInTractorBeam(orxBOOL isInTractorBeam) { m_IsInTractorBeam = isInTractorBeam; }
 
 protected:
@@ -28,6 +30,8 @@ private:
                 orxVECTOR       m_vPreviousSpeed;
 
                 orxBOOL         m_IsInTractorBeam;
+                orxFLOAT        m_ShapeDamageBlow;
+                orxFLOAT        m_ShapeDamageBounce;
 };
 
 #endif // __SHAPE_H__
