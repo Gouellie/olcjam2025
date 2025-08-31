@@ -101,6 +101,10 @@ void Vacuum::Update(const orxCLOCK_INFO &_rstInfo)
     {
         SetIsBeamActive(orxFALSE);
     }
+    else if (m_IsBeamActive && orxInput_IsActive("Vacuum") == orxFALSE)
+    {
+        SetIsBeamActive(orxFALSE);
+    }
     else if (poGaugeBoost->GetIsMaxedOut())
     {
         if (m_IsBeamActive) 
