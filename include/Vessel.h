@@ -43,6 +43,7 @@ private:
                 orxBOOL         m_IsDocked;
 
                 orxU64          m_VacuumGUID;
+                orxU64          m_GaugeBoostGUID;
 
                 orxFLOAT        m_ShapesImpulseMultiplier;
                 orxU16          m_ShapesCollisionFlag;

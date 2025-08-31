@@ -5,6 +5,7 @@
 
 #include "Vessel.h"
 #include "Vacuum.h"
+#include "Gauge.h"
 #include "Starbase.h"
 #include "MoreMath.h"
 #include "Utils.h"
@@ -43,6 +44,9 @@ void Vessel::OnCreate()
 
     m_pstCompass = orxObject_CreateFromConfig("VesselCompass");
     orxObject_SetOwner(m_pstCompass, GetOrxObject());
+
+    Gauge* poGaugeBoost = (Gauge*)olcjam2025::GetInstance().GetObject("Runtime", "GaugeBoost");
+    m_GaugeBoostGUID = poGaugeBoost->GetGUID();
 }
 
 void Vessel::OnDelete()
@@ -114,6 +118,8 @@ void Vessel::Update(const orxCLOCK_INFO &_rstInfo)
 
 void Vessel::MovePlayer(const orxCLOCK_INFO& _rstInfo)
 {
+    Gauge* poGaugeBoost = (Gauge*)olcjam2025::GetInstance().GetObject(m_GaugeBoostGUID);
+
     // Update player position
     orxVECTOR PlayerMove, PlayerPos, PlayerSpeed;
 
@@ -128,14 +134,28 @@ void Vessel::MovePlayer(const orxCLOCK_INFO& _rstInfo)
         {
             AddTrack("VesselMovingStopTrack");
         }
+        poGaugeBoost->SetAutoRefill(orxTRUE);
         m_IsMoving = orxFALSE;
     }
     else 
     {
+        orxFLOAT playerBoosting = orxFLOAT_0;
+        if (orxInput_GetValue("Fast") && poGaugeBoost->CanDeplete())
+        {
+            if (poGaugeBoost->Deplete(_rstInfo) > orxFLOAT_0) 
+            {
+                playerBoosting = orxFLOAT_1;
+            }
+        }
+        else 
+        {
+            poGaugeBoost->SetAutoRefill(orxTRUE);
+        }
+
         orxVector_Normalize(&PlayerMove, &PlayerMove);
 
         orxVector_Mulf(&PlayerMove,
-            orxVector_Mul(&PlayerMove, &PlayerMove, orxVector_Lerp(&PlayerSpeed, &m_vPlayerSpeed, &m_vPlayerHighSpeed, orxInput_GetValue("Fast"))),
+            orxVector_Mul(&PlayerMove, &PlayerMove, orxVector_Lerp(&PlayerSpeed, &m_vPlayerSpeed, &m_vPlayerHighSpeed, playerBoosting)),
             _rstInfo.fDT);
 
         orxObject_SetPosition(GetOrxObject(), orxVector_Add(&PlayerPos,
