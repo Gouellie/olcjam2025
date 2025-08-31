@@ -70,10 +70,12 @@ void olcjam2025::Update(const orxCLOCK_INFO &_rstClockInfo)
   {
       orxObject_CreateFromConfig("TitleSceneBack");
       m_bIsInTitleScreen = orxTRUE;
+      m_bIsOptionScreenShown = orxFALSE;
   }
   else if (orxInput_HasBeenActivated("Resume"))
   {
       orxObject_CreateFromConfig("ClearOptionScreen");
+      m_bIsOptionScreenShown = orxFALSE;
   }
   else if (orxInput_HasBeenActivated("Options"))
   {
@@ -85,7 +87,7 @@ void olcjam2025::Update(const orxCLOCK_INFO &_rstClockInfo)
       {
           if (m_bIsOptionScreenShown)
           {
-              orxObject_CreateFromConfig("UIOptionMenuSound");
+              orxObject_CreateFromConfig("Sound_RadialOptionFocused");
               orxObject_CreateFromConfig("ClearOptionScreen");
               m_bIsOptionScreenShown = orxFALSE;
           }
