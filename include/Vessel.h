@@ -16,8 +16,8 @@ class Vessel : public ScrollObject
 {
 public:
 
-                void            SetIsDocking(orxBOOL isDocking);
-                void            SetIsDocked(orxBOOL isDocked);
+                void            SetIsDocking(orxBOOL isDocking) { m_IsDocking = isDocking; }
+                void            SetIsDocked(orxBOOL isDocked) { m_IsDocked = isDocked; }
                 void            GetCameraPosition(orxVECTOR& position) const;
 
 protected:
@@ -27,7 +27,7 @@ protected:
                 void            Update(const orxCLOCK_INFO &_rstInfo);
 
                 void            OnCollide(ScrollObject* _poCollider, orxBODY_PART* _pstPart, orxBODY_PART* _pstColliderPart, const orxVECTOR& _rvPosition, const orxVECTOR& _rvNormal);
-
+                void            OnSeparate(ScrollObject* _poCollider, orxBODY_PART* _pstPart, orxBODY_PART* _pstColliderPart);
 private:
 
                 orxVECTOR       m_PreviousCameraPos;
@@ -41,6 +41,7 @@ private:
                 orxBOOL         m_IsZooming;
                 orxBOOL         m_IsDocking;
                 orxBOOL         m_IsDocked;
+                orxBOOL         m_IsInsideShield;
 
                 orxU64          m_VacuumGUID;
                 orxU64          m_GaugeBoostGUID;
@@ -48,10 +49,13 @@ private:
 
                 orxFLOAT        m_ShapesImpulseMultiplier;
                 orxU16          m_ShapesCollisionFlag;
+                orxU16          m_StarbaseShieldCollisionFlag;
 
                 orxBOOL         m_IsMoving;
 
 private:
+
+                void            SetIsInsideStarbaseShield(orxBOOL value);
 
                 orxBOOL         IsPlayerReturningToBase(const orxCLOCK_INFO& _rstInfo);
                 void            MovePlayer(const orxCLOCK_INFO& _rstInfo);

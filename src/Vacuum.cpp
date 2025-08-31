@@ -63,9 +63,13 @@ void Vacuum::Update(const orxCLOCK_INFO &_rstInfo)
 
     Gauge* poGaugeBoost = (Gauge*)olcjam2025::GetInstance().GetObject(m_GaugeShapesGUID);
 
-    if (!m_IsBeamLocked && orxInput_HasBeenActivated("Vacuum"))
+    if (orxInput_HasBeenActivated("Vacuum"))
     {
-        if (poGaugeBoost->GetIsMaxedOut())
+        if (m_IsBeamLocked) 
+        {
+            AddTrack("VacuumBeamIsLockedTrack");
+        }
+        else if (poGaugeBoost->GetIsMaxedOut())
         {
             poGaugeBoost->AddTrack("GaugeShapesIsFullTrack");
             SetIsBeamActive(orxFALSE);
@@ -94,6 +98,11 @@ void Vacuum::SetIsBeamLocked(orxBOOL isBeamLocked)
     m_IsBeamLocked = isBeamLocked;
     if (m_IsBeamLocked) 
     {
+        if (m_IsBeamActive) 
+        {
+            AddTrack("VacuumBeamIsLockedTrack");
+        }
+
         SetIsBeamActive(orxFALSE);
     }
 }
@@ -178,7 +187,7 @@ void VacuumHead::FireShape()
     orxU64 shapeID = m_collection.top();
     m_collection.pop();
 
-    poGaugeShapes->SetCurrentValue(m_collection.size());
+    poGaugeShapes->SetCurrentValue(orxS2F(m_collection.size()));
 
     orxVECTOR pos, impulse;
 

@@ -41,6 +41,7 @@ void Vessel::OnCreate()
 
     m_ShapesImpulseMultiplier = orxConfig_GetFloat("ShapesImpulseMultiplier");
     m_ShapesCollisionFlag = (orxU16)orxPhysics_GetCollisionFlagValue("shape");
+    m_StarbaseShieldCollisionFlag = (orxU16)orxPhysics_GetCollisionFlagValue("starbase_shield_phantom");
 
     m_pstCompass = orxObject_CreateFromConfig("VesselCompass");
     orxObject_SetOwner(m_pstCompass, GetOrxObject());
@@ -107,8 +108,6 @@ void Vessel::Update(const orxCLOCK_INFO &_rstInfo)
 
     m_CameraBox.Update(_rstInfo);
 }
-
-
 
 orxBOOL Vessel::IsPlayerReturningToBase(const orxCLOCK_INFO& _rstInfo)
 {
@@ -207,35 +206,21 @@ void Vessel::MovePlayer(const orxCLOCK_INFO& _rstInfo)
     }
 }
 
-void Vessel::SetIsDocking(orxBOOL isDocking)
+void Vessel::SetIsInsideStarbaseShield(orxBOOL value)
 {
-    m_IsDocking = isDocking;
-    if (m_IsDocking) 
-    {
-        if (Vacuum* pstVacuum = (Vacuum*)olcjam2025::GetInstance().GetObject(m_VacuumGUID))
-        {
-            pstVacuum->SetIsBeamLocked(orxTRUE);
-            pstVacuum->Enable(orxFALSE, orxTRUE);
-            m_CameraBox.SetIsVacuumLocked(orxTRUE);
-
-            if (m_IsZooming) 
-            {
-                m_IsZooming = orxFALSE;
-                orxObject_AddTimeLineTrack(m_Camera, "ZoomIn");
-            }
-        }
-    }
-}
-
-void Vessel::SetIsDocked(orxBOOL isDocked)
-{
-    m_IsDocked = isDocked;
     if (Vacuum* pstVacuum = (Vacuum*)olcjam2025::GetInstance().GetObject(m_VacuumGUID))
     {
-        pstVacuum->SetIsBeamLocked(m_IsDocked);
-        pstVacuum->Enable(m_IsDocked == false, orxTRUE);
-        m_CameraBox.SetIsVacuumLocked(m_IsDocked);
+        pstVacuum->SetIsBeamLocked(value);
+        pstVacuum->Enable(~value, orxTRUE);
+        m_CameraBox.SetIsVacuumLocked(value);
     }
+    if (value && m_IsZooming)
+    {
+        m_IsZooming = orxFALSE;
+        orxObject_AddTimeLineTrack(m_Camera, "ZoomIn");
+    }
+
+    m_IsInsideShield = value;
 }
 
 void Vessel::GetCameraPosition(orxVECTOR& position) const
@@ -253,6 +238,18 @@ void Vessel::OnCollide(ScrollObject* _poCollider, orxBODY_PART* _pstPart, orxBOD
         orxBody_ApplyImpulse(orxBody_GetPartBody(_pstColliderPart), &impulse, &_rvPosition);
 
         AddSound("Sound_BounceFromShip");
+    }
+    if (orxBody_GetPartSelfFlags(_pstColliderPart) == m_StarbaseShieldCollisionFlag)
+    {
+        SetIsInsideStarbaseShield(orxTRUE);
+    }
+}
+
+void Vessel::OnSeparate(ScrollObject* _poCollider, orxBODY_PART* _pstPart, orxBODY_PART* _pstColliderPart) 
+{
+    if (orxBody_GetPartSelfFlags(_pstColliderPart) == m_StarbaseShieldCollisionFlag)
+    {
+        SetIsInsideStarbaseShield(orxFALSE);
     }
 }
 
