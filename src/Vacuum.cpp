@@ -166,17 +166,19 @@ void VacuumHead::FireShape()
 {
     m_FireDelay = m_WaitForFire;
 
+    Gauge* poGaugeShapes = (Gauge*)olcjam2025::GetInstance().GetObject(m_GaugeShapesGUID);
     if (m_collection.empty())
     {
         AddTrack("VacuumFireShapeShootingBlankTrack");
+        poGaugeShapes->AddTrack("GaugeShapesIsEmptyTrack");
+        m_FireDelay = m_WaitForFire;
         return;
     }
 
     orxU64 shapeID = m_collection.top();
     m_collection.pop();
 
-    Gauge* poGaugeBoost = (Gauge*)olcjam2025::GetInstance().GetObject(m_GaugeShapesGUID);
-    poGaugeBoost->SetCurrentValue(m_collection.size());
+    poGaugeShapes->SetCurrentValue(m_collection.size());
 
     orxVECTOR pos, impulse;
 
