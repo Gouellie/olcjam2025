@@ -18,6 +18,7 @@ public:
 
     orxBOOL         GetIsBeamLocked() const { return m_IsBeamLocked; }
     void            SetIsBeamLocked(orxBOOL isBeamLocked);
+    void            SetIsVesselDocked(orxBOOL isVesselDocked) { m_IsIsVesselDocked = isVesselDocked; };
 
 protected:
 
@@ -29,6 +30,7 @@ private:
 
     orxBOOL         m_IsBeamActive;
     orxBOOL         m_IsBeamLocked;
+    orxBOOL         m_IsIsVesselDocked;
     orxFLOAT        m_DesiredRotation = orxFLOAT_0;
     orxFLOAT        m_RotationSpeed;
     orxU64          m_vacuumHeadGUID;

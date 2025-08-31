@@ -65,9 +65,12 @@ void Vacuum::Update(const orxCLOCK_INFO &_rstInfo)
 
     if (orxInput_HasBeenActivated("Vacuum"))
     {
-        if (m_IsBeamLocked) 
+        if (m_IsBeamLocked)
         {
-            AddTrack("VacuumBeamIsLockedTrack");
+            if (!m_IsIsVesselDocked) 
+            {
+                AddTrack("VacuumBeamIsLockedTrack");
+            }
         }
         else if (poGaugeBoost->GetIsMaxedOut())
         {

@@ -17,7 +17,7 @@ class Vessel : public ScrollObject
 public:
 
                 void            SetIsDocking(orxBOOL isDocking) { m_IsDocking = isDocking; }
-                void            SetIsDocked(orxBOOL isDocked) { m_IsDocked = isDocked; }
+                void            SetIsDocked(orxBOOL isDocked) const;
                 void            GetCameraPosition(orxVECTOR& position) const;
 
 protected:

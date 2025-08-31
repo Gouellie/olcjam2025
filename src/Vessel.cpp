@@ -89,7 +89,7 @@ void Vessel::Update(const orxCLOCK_INFO &_rstInfo)
                 }
             }
         }
-        else
+        else if (!m_IsInsideShield)
         {
             // Zoom Out?
             if (orxInput_HasBeenActivated("Zoom"))
@@ -216,12 +216,22 @@ void Vessel::SetIsInsideStarbaseShield(orxBOOL value)
     }
     if (value && m_IsZooming)
     {
-        m_IsZooming = orxFALSE;
         orxObject_AddTimeLineTrack(m_Camera, "ZoomIn");
+        m_IsZooming = orxFALSE;
     }
 
     m_IsInsideShield = value;
 }
+
+
+void Vessel::SetIsDocked(orxBOOL isDocked) const
+{
+    if (Vacuum* pstVacuum = (Vacuum*)olcjam2025::GetInstance().GetObject(m_VacuumGUID))
+    {
+        pstVacuum->SetIsVesselDocked(isDocked);
+    }
+}
+
 
 void Vessel::GetCameraPosition(orxVECTOR& position) const
 {
