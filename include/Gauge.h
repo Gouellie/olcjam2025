@@ -30,6 +30,7 @@ public:
                 void                RefillToMax() { m_CurrentValue = m_GaugeMax; }
                 orxFLOAT            Deplete(const orxCLOCK_INFO& _rstInfo);
                 orxFLOAT            Refill(const orxCLOCK_INFO& _rstInfo);
+                void                Increment(orxFLOAT amount);
                 void                Decrement(orxFLOAT amount);
 
 protected:

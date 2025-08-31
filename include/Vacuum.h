@@ -66,6 +66,7 @@ private:
     orxFLOAT        m_WaitForDeposit;
 
     orxU64          m_GaugeShapesGUID;
+    orxU64          m_GaugeDepositGUID;
     orxU64          m_GaugeHealthGUID;
 
     std::stack<orxU64> m_collection;

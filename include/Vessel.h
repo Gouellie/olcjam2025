@@ -49,6 +49,7 @@ private:
                 orxU64          m_VacuumGUID;
                 orxU64          m_GaugeBoostGUID;
                 orxU64          m_GaugeHealthGUID;
+                orxU64          m_GaugeDepositGUID;
                 orxU64          m_GaugeReturnToBaseGUID = orxU64_UNDEFINED;
 
                 orxFLOAT        m_ShapesImpulseMultiplier;

@@ -53,6 +53,9 @@ void Vessel::OnCreate()
     Gauge* poGaugeHealth = (Gauge*)olcjam2025::GetInstance().GetObject("Runtime", "GaugeHealth");
     m_GaugeHealthGUID = poGaugeHealth->GetGUID();
 
+    Gauge* poGaugeDeposit = (Gauge*)olcjam2025::GetInstance().GetObject("Runtime", "GaugeDeposit");
+    m_GaugeDepositGUID = poGaugeDeposit->GetGUID();
+
     m_IsInvincible = orxTRUE;
 }
 
@@ -76,6 +79,16 @@ void Vessel::Update(const orxCLOCK_INFO &_rstInfo)
         m_IsInvincible = orxFALSE;
     }
     
+    Gauge* poGaugeDeposit = (Gauge*)olcjam2025::GetInstance().GetObject(m_GaugeDepositGUID);
+    if (poGaugeDeposit->GetIsMaxedOut())
+    {
+        if (!m_GameOver)
+        {
+            orxObject_CreateFromConfig("GameWon");
+            m_GameOver = orxTRUE;
+        }
+    }
+
     Gauge* poGaugeHealth = (Gauge*)olcjam2025::GetInstance().GetObject(m_GaugeHealthGUID);
     if (poGaugeHealth->GetIsDepleted()) 
     {
@@ -134,7 +147,7 @@ void Vessel::Update(const orxCLOCK_INFO &_rstInfo)
         orxObject_AddTimeLineTrack(m_Camera, "ZoomOut");
     }
     // Zoom In?
-    else if (orxInput_HasBeenDeactivated("Zoom"))
+    else if (m_IsZooming && orxInput_HasBeenDeactivated("Zoom"))
     {
         m_IsZooming = orxFALSE;
         orxObject_AddTimeLineTrack(m_Camera, "ZoomIn");
@@ -145,6 +158,11 @@ void Vessel::Update(const orxCLOCK_INFO &_rstInfo)
 
 orxBOOL Vessel::IsPlayerReturningToBase(const orxCLOCK_INFO& _rstInfo)
 {
+    if (m_IsInsideShield) 
+    {
+        return orxFALSE;
+    }
+
     Gauge* poGauge = (Gauge*)olcjam2025::GetInstance().GetObject(m_GaugeReturnToBaseGUID);
 
     if (orxInput_HasBeenActivated("ReturnToStarBase"))

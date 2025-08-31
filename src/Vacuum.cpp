@@ -155,8 +155,11 @@ void Vacuum::SetIsBeamActive(orxBOOL isBeamActive)
 
 void VacuumHead::OnCreate()
 {
-    Gauge* poGaugeBoost = (Gauge*)olcjam2025::GetInstance().GetObject("Runtime", "GaugeShapes");
-    m_GaugeShapesGUID = poGaugeBoost->GetGUID();
+    Gauge* poGaugeShapes = (Gauge*)olcjam2025::GetInstance().GetObject("Runtime", "GaugeShapes");
+    m_GaugeShapesGUID = poGaugeShapes->GetGUID();
+
+    Gauge* poGaugeDeposit = (Gauge*)olcjam2025::GetInstance().GetObject("Runtime", "GaugeDeposit");
+    m_GaugeDepositGUID = poGaugeDeposit->GetGUID();
 
     Gauge* poGaugeHealth = (Gauge*)olcjam2025::GetInstance().GetObject("Runtime", "GaugeHealth");
     m_GaugeHealthGUID = poGaugeHealth->GetGUID();
@@ -180,6 +183,7 @@ void VacuumHead::Update(const orxCLOCK_INFO& _rstInfo)
             m_DepositDelay = m_WaitForDeposit;
 
             Gauge* poGaugeShapes = (Gauge*)olcjam2025::GetInstance().GetObject(m_GaugeShapesGUID);
+
             if (m_collection.empty())
             {
                 AddTrack("VacuumFireShapeShootingBlankTrack");
@@ -187,10 +191,11 @@ void VacuumHead::Update(const orxCLOCK_INFO& _rstInfo)
             }
             else 
             {
+                Gauge* poGaugeDeposit = (Gauge*)olcjam2025::GetInstance().GetObject(m_GaugeDepositGUID);
                 poGaugeShapes->AddTrack("GaugeShapesDepositTrack");
                 orxU64 shapeID = m_collection.top();
                 m_collection.pop();
-
+                poGaugeDeposit->Increment(orxFLOAT_1);
                 poGaugeShapes->SetCurrentValue(orxS2F(m_collection.size()));
             }
 
