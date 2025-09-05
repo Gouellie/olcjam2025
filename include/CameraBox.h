@@ -2,6 +2,8 @@
 
 #include "olcjam2025.h"
 
+class Vessel;
+
 class CameraBox
 {
 public:
@@ -17,7 +19,7 @@ public:
 	orxVECTOR m_BeamFacing{ orxVECTOR_Y };
 
 	CameraBox() = default;
-	void Update(const orxCLOCK_INFO& _rstInfo);
+	void Update(const Vessel* vessel, const orxCLOCK_INFO& _rstInfo);
 
 	void SetCamera(orxOBJECT* camera) { m_Camera = camera; }
 	orxOBJECT* GetCamera() const { return m_Camera; }
@@ -27,9 +29,8 @@ public:
 
 	void SetVacuumID(orxU64 vacuumId) { m_VacuumGUID = vacuumId; }
 
-	orxBOOL GetBeamActive() const;
+    // This can be moved to Vessel.h
 	orxFLOAT GetBeamPosition() const;
 	orxFLOAT GetBeamLength() const;
-	orxBOOL TargetIsMoving() const;
 };
 

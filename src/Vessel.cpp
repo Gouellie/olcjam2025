@@ -142,7 +142,7 @@ void Vessel::Update(const orxCLOCK_INFO &_rstInfo)
         orxObject_AddTimeLineTrack(m_Camera, "ZoomIn");
     }
 
-    m_CameraBox.Update(_rstInfo);
+    m_CameraBox.Update(this, _rstInfo);
 }
 
 orxBOOL Vessel::IsPlayerReturningToBase(const orxCLOCK_INFO& _rstInfo)

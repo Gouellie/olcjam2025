@@ -17,6 +17,7 @@ class Vessel : public ScrollObject
 public:
         
                 orxBOOL         GetBeamActive() const;
+                orxBOOL         GetIsMoving() const { return m_IsMoving; }
 
                 void            SetIsDocking(orxBOOL isDocking) { m_IsDocking = isDocking; }
                 void            SetIsDocked(orxBOOL isDocked);

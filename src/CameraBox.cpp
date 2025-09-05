@@ -11,7 +11,7 @@ void CameraBox::SetTarget(ScrollObject* target)
     m_TargetLock = m_Target->GetPosition(m_TargetLock);
 }
 
-void CameraBox::Update(const orxCLOCK_INFO& _rstInfo)
+void CameraBox::Update(const Vessel* vessel, const orxCLOCK_INFO& _rstInfo)
 {
     orxConfig_PushSection("CameraBox");
 	// Special case for "mining" activity
@@ -27,7 +27,7 @@ void CameraBox::Update(const orxCLOCK_INFO& _rstInfo)
     speed = m_Target->GetSpeed(speed);
     // I'd like to have something more generic instead, but this is a patch
     //if (orxVector_IsNull(&speed))
-    if (!TargetIsMoving())
+    if (!vessel->GetIsMoving())
     {
         m_TargetLock = targetPos;
     }
@@ -76,7 +76,7 @@ void CameraBox::Update(const orxCLOCK_INFO& _rstInfo)
     //Move the camera and smoothing
     m_DesiredPos = *orxVector_Add(&m_DesiredPos, &m_TargetLock, &delta);
 
-    if (GetBeamActive())
+    if (vessel->GetBeamActive())
     {
         m_BeamFacing = orxVECTOR_Y;
         orxVector_2DRotate(&m_BeamFacing, &m_BeamFacing, GetBeamPosition());
@@ -91,16 +91,6 @@ void CameraBox::Update(const orxCLOCK_INFO& _rstInfo)
     m_CameraPos = pos;
 
     orxConfig_PopSection();
-}
-
-orxBOOL CameraBox::GetBeamActive() const
-{
-    if (const Vessel* vessel = (Vessel*)olcjam2025::GetInstance().GetObject("Vessel")) 
-    {
-        return vessel->GetBeamActive();
-    }
-
-    return orxFALSE;
 }
 
 orxFLOAT CameraBox::GetBeamPosition() const
@@ -120,9 +110,4 @@ orxFLOAT CameraBox::GetBeamLength() const
     beamSize = *orxConfig_GetVector("Size", &beamSize);
     orxConfig_PopSection();
     return beamSize.fY;
-}
-
-orxBOOL CameraBox::TargetIsMoving() const
-{
-    return orxInput_IsActive("Right") | orxInput_IsActive("Left") | orxInput_IsActive("Down") | orxInput_IsActive("Up");
 }
