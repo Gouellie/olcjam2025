@@ -15,6 +15,8 @@
 class Vessel : public ScrollObject
 {
 public:
+        
+                orxBOOL         GetBeamActive() const;
 
                 void            SetIsDocking(orxBOOL isDocking) { m_IsDocking = isDocking; }
                 void            SetIsDocked(orxBOOL isDocked);
@@ -47,9 +49,6 @@ private:
                 orxBOOL         m_IsInsideShield;
 
                 orxU64          m_VacuumGUID;
-                orxU64          m_GaugeBoostGUID;
-                orxU64          m_GaugeHealthGUID;
-                orxU64          m_GaugeDepositGUID;
                 orxU64          m_GaugeReturnToBaseGUID = orxU64_UNDEFINED;
 
                 orxFLOAT        m_ShapesImpulseMultiplier;

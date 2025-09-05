@@ -13,8 +13,6 @@
 
 void Vessel::OnCreate()
 {
-    olcjam2025::GetInstance().SetActiveVesselID(GetGUID());
-
     // Init the camera
     m_Camera = orxObject_CreateFromConfig("Camera");
     orxObject_GetPosition(m_Camera, &m_PreviousCameraPos);
@@ -47,15 +45,6 @@ void Vessel::OnCreate()
     m_pstCompass = orxObject_CreateFromConfig("VesselCompass");
     orxObject_SetOwner(m_pstCompass, GetOrxObject());
 
-    Gauge* poGaugeBoost = (Gauge*)olcjam2025::GetInstance().GetObject("Runtime", "GaugeBoost");
-    m_GaugeBoostGUID = poGaugeBoost->GetGUID();
-
-    Gauge* poGaugeHealth = (Gauge*)olcjam2025::GetInstance().GetObject("Runtime", "GaugeHealth");
-    m_GaugeHealthGUID = poGaugeHealth->GetGUID();
-
-    Gauge* poGaugeDeposit = (Gauge*)olcjam2025::GetInstance().GetObject("Runtime", "GaugeDeposit");
-    m_GaugeDepositGUID = poGaugeDeposit->GetGUID();
-
     m_IsInvincible = orxTRUE;
 }
 
@@ -79,7 +68,7 @@ void Vessel::Update(const orxCLOCK_INFO &_rstInfo)
         m_IsInvincible = orxFALSE;
     }
     
-    Gauge* poGaugeDeposit = (Gauge*)olcjam2025::GetInstance().GetObject(m_GaugeDepositGUID);
+    Gauge* poGaugeDeposit = (Gauge*)olcjam2025::GetInstance().GetObject("GaugeDeposit");
     if (poGaugeDeposit->GetIsMaxedOut())
     {
         if (!m_GameOver)
@@ -89,7 +78,7 @@ void Vessel::Update(const orxCLOCK_INFO &_rstInfo)
         }
     }
 
-    Gauge* poGaugeHealth = (Gauge*)olcjam2025::GetInstance().GetObject(m_GaugeHealthGUID);
+    Gauge* poGaugeHealth = (Gauge*)olcjam2025::GetInstance().GetObject("GaugeHealth");
     if (poGaugeHealth->GetIsDepleted()) 
     {
         if (!m_GameOver) 
@@ -205,7 +194,7 @@ orxBOOL Vessel::IsPlayerReturningToBase(const orxCLOCK_INFO& _rstInfo)
 
 void Vessel::MovePlayer(const orxCLOCK_INFO& _rstInfo)
 {
-    Gauge* poGaugeBoost = (Gauge*)olcjam2025::GetInstance().GetObject(m_GaugeBoostGUID);
+    Gauge* poGaugeBoost = (Gauge*)olcjam2025::GetInstance().GetObject("GaugeBoost");
 
     // Update player position
     orxVECTOR PlayerMove, PlayerPos, PlayerSpeed;
@@ -258,16 +247,35 @@ void Vessel::MovePlayer(const orxCLOCK_INFO& _rstInfo)
     }
 }
 
+orxBOOL Vessel::GetBeamActive() const 
+{
+    if (Vacuum* vacuum = (Vacuum*)olcjam2025::GetInstance().GetObject(m_VacuumGUID))
+    {
+        if (vacuum->GetIsBeamLocked())
+        {
+            return orxFALSE;
+        }
+    }
+    if (Gauge* shapeGauge = (Gauge*)olcjam2025::GetInstance().GetObject("GaugeShapes"))
+    {
+        if (shapeGauge->GetIsMaxedOut())
+        {
+            return orxFALSE;
+        }
+    }
+
+    return orxInput_IsActive("Vacuum");
+}
+
 void Vessel::SetIsInsideStarbaseShield(orxBOOL value)
 {
     if (Vacuum* pstVacuum = (Vacuum*)olcjam2025::GetInstance().GetObject(m_VacuumGUID))
     {
         pstVacuum->SetIsBeamLocked(value);
         pstVacuum->Enable(~value, orxTRUE);
-        m_CameraBox.SetIsVacuumLocked(value);
     }
 
-    Gauge* poGaugeHealth = (Gauge*)olcjam2025::GetInstance().GetObject(m_GaugeHealthGUID);
+    Gauge* poGaugeHealth = (Gauge*)olcjam2025::GetInstance().GetObject("GaugeHealth");
     poGaugeHealth->SetAutoRefill(value);
 
     m_IsInsideShield = value;
@@ -305,7 +313,7 @@ void Vessel::OnCollide(ScrollObject* _poCollider, orxBODY_PART* _pstPart, orxBOD
                 AddTrack("VesselDamageBounceTrack");
                 orxBody_RemovePart(_pstColliderPart);
                 _poCollider->AddTrack("NegativeShapeCollisionTrack");
-                Gauge* poGaugeHealth = (Gauge*)olcjam2025::GetInstance().GetObject(m_GaugeHealthGUID);
+                Gauge* poGaugeHealth = (Gauge*)olcjam2025::GetInstance().GetObject("GaugeHealth");
                 poGaugeHealth->Decrement(((Shape*)_poCollider)->GetShapeDamageBounce());
             }
         }

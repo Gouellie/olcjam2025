@@ -18,7 +18,7 @@ void Starbase::OnDelete()
 
 void Starbase::Update(const orxCLOCK_INFO &_rstInfo)
 {
-    Vessel* pstVessel = (Vessel*)olcjam2025::GetInstance().GetObject(olcjam2025::GetInstance().GetActiveVesselID());
+    Vessel* pstVessel = (Vessel*)olcjam2025::GetInstance().GetObject("Vessel");
     if (pstVessel == orxNULL)
         return;
 

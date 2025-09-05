@@ -34,7 +34,7 @@ void LoadingGrid::OnDelete()
 void LoadingGrid::Update(const orxCLOCK_INFO &_rstInfo)
 {
     orxVECTOR cameraPos;
-    if (Vessel* poVessel = (Vessel*)olcjam2025::GetInstance().GetObject(olcjam2025::GetInstance().GetActiveVesselID()))
+    if (Vessel* poVessel = (Vessel*)olcjam2025::GetInstance().GetObject("Vessel"))
     {
         poVessel->GetCameraPosition(cameraPos);
     }

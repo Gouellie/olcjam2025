@@ -3,7 +3,7 @@
 #include <math/orxMath.h>
 #include <math/orxVector.h>
 
-#include "Gauge.h"
+#include "Vessel.h"
 
 void CameraBox::SetTarget(ScrollObject* target)
 {
@@ -95,19 +95,12 @@ void CameraBox::Update(const orxCLOCK_INFO& _rstInfo)
 
 orxBOOL CameraBox::GetBeamActive() const
 {
-    if (m_VacuumLocked) 
+    if (const Vessel* vessel = (Vessel*)olcjam2025::GetInstance().GetObject("Vessel")) 
     {
-        return orxFALSE;
-    }
-    if (Gauge* shapeGauge = (Gauge*)olcjam2025::GetInstance().GetObject("Runtime", "GaugeShapes")) 
-    {
-        if (shapeGauge->GetIsMaxedOut()) 
-        {
-            return orxFALSE;
-        }
+        return vessel->GetBeamActive();
     }
 
-    return orxInput_IsActive("Vacuum");
+    return orxFALSE;
 }
 
 orxFLOAT CameraBox::GetBeamPosition() const

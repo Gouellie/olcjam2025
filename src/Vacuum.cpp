@@ -10,13 +10,6 @@
 
 void Vacuum::OnCreate()
 {
-    Gauge* poGaugeBoost = (Gauge*)olcjam2025::GetInstance().GetObject("Runtime", "GaugeShapes");
-    m_GaugeShapesGUID = poGaugeBoost->GetGUID();
-
-    Gauge* poGaugeHealth = (Gauge*)olcjam2025::GetInstance().GetObject("Runtime", "GaugeHealth");
-    m_GaugeHealthGUID = poGaugeHealth->GetGUID();
-
-
     m_RotationSpeed = orxConfig_GetFloat("RotationSpeed");
 
     for (orxOBJECT* pstChild = orxObject_GetOwnedChild(GetOrxObject());
@@ -39,7 +32,7 @@ void Vacuum::Update(const orxCLOCK_INFO &_rstInfo)
 {
     orxVECTOR VacuumHead;
 
-    Gauge* poGaugeHealth = (Gauge*)olcjam2025::GetInstance().GetObject(m_GaugeHealthGUID);
+    Gauge* poGaugeHealth = (Gauge*)olcjam2025::GetInstance().GetObject("GaugeHealth");
     if (poGaugeHealth->GetIsDepleted())
     {
         if (m_IsBeamActive)
@@ -62,11 +55,11 @@ void Vacuum::Update(const orxCLOCK_INFO &_rstInfo)
             m_DesiredRotation = get_angle(VacuumHead);
         }
     }
-    else if (orxOBJECT* pstVessel = orxOBJECT(orxStructure_Get(olcjam2025::GetInstance().GetActiveVesselID())))
+    else if (ScrollObject* poVessel = olcjam2025::GetInstance().GetObject("Vessel"))
     {
         orxVECTOR mousePosition, vesselPosition;
         orxMouse_GetPosition(&mousePosition);
-        orxObject_GetWorldPosition(pstVessel, &vesselPosition);
+        poVessel->GetPosition(vesselPosition, orxTRUE);
         orxRender_GetScreenPosition(&vesselPosition, orxViewport_Get("MainViewport"), &vesselPosition);
 
         orxVector_Sub(&VacuumHead, &mousePosition, &vesselPosition);
@@ -76,7 +69,7 @@ void Vacuum::Update(const orxCLOCK_INFO &_rstInfo)
 
     SetRotation(lerp_angle(GetRotation(), m_DesiredRotation, _rstInfo.fDT * m_RotationSpeed));
 
-    Gauge* poGaugeBoost = (Gauge*)olcjam2025::GetInstance().GetObject(m_GaugeShapesGUID);
+    Gauge* poGaugeShapes = (Gauge*)olcjam2025::GetInstance().GetObject("GaugeShapes");
 
     if (orxInput_HasBeenActivated("Vacuum"))
     {
@@ -87,9 +80,9 @@ void Vacuum::Update(const orxCLOCK_INFO &_rstInfo)
                 AddTrack("VacuumBeamIsLockedTrack");
             }
         }
-        else if (poGaugeBoost->GetIsMaxedOut())
+        else if (poGaugeShapes->GetIsMaxedOut())
         {
-            poGaugeBoost->AddTrack("GaugeShapesIsFullTrack");
+            poGaugeShapes->AddTrack("GaugeShapesIsFullTrack");
             SetIsBeamActive(orxFALSE);
         }
         else 
@@ -105,11 +98,11 @@ void Vacuum::Update(const orxCLOCK_INFO &_rstInfo)
     {
         SetIsBeamActive(orxFALSE);
     }
-    else if (poGaugeBoost->GetIsMaxedOut())
+    else if (poGaugeShapes->GetIsMaxedOut())
     {
         if (m_IsBeamActive) 
         {
-            poGaugeBoost->AddTrack("GaugeShapesIsFullTrack");
+            poGaugeShapes->AddTrack("GaugeShapesIsFullTrack");
             SetIsBeamActive(orxFALSE);
         }
     }
@@ -159,15 +152,6 @@ void Vacuum::SetIsBeamActive(orxBOOL isBeamActive)
 
 void VacuumHead::OnCreate()
 {
-    Gauge* poGaugeShapes = (Gauge*)olcjam2025::GetInstance().GetObject("Runtime", "GaugeShapes");
-    m_GaugeShapesGUID = poGaugeShapes->GetGUID();
-
-    Gauge* poGaugeDeposit = (Gauge*)olcjam2025::GetInstance().GetObject("Runtime", "GaugeDeposit");
-    m_GaugeDepositGUID = poGaugeDeposit->GetGUID();
-
-    Gauge* poGaugeHealth = (Gauge*)olcjam2025::GetInstance().GetObject("Runtime", "GaugeHealth");
-    m_GaugeHealthGUID = poGaugeHealth->GetGUID();
-
     m_WaitForFire    = orxConfig_GetFloat("WaitForFire");
     m_FireSpeed      = orxConfig_GetFloat("FireSpeed");
     m_WaitForDeposit = orxConfig_GetFloat("WaitForDeposit");
@@ -186,7 +170,7 @@ void VacuumHead::Update(const orxCLOCK_INFO& _rstInfo)
         {
             m_DepositDelay = m_WaitForDeposit;
 
-            Gauge* poGaugeShapes = (Gauge*)olcjam2025::GetInstance().GetObject(m_GaugeShapesGUID);
+            Gauge* poGaugeShapes = (Gauge*)olcjam2025::GetInstance().GetObject("GaugeShapes");
 
             if (m_collection.empty())
             {
@@ -195,7 +179,7 @@ void VacuumHead::Update(const orxCLOCK_INFO& _rstInfo)
             }
             else 
             {
-                Gauge* poGaugeDeposit = (Gauge*)olcjam2025::GetInstance().GetObject(m_GaugeDepositGUID);
+                Gauge* poGaugeDeposit = (Gauge*)olcjam2025::GetInstance().GetObject("GaugeDeposit");
                 poGaugeShapes->AddTrack("GaugeShapesDepositTrack");
                 orxU64 shapeID = m_collection.top();
                 m_collection.pop();
@@ -231,7 +215,7 @@ void VacuumHead::FireShape()
 {
     m_FireDelay = m_WaitForFire;
 
-    Gauge* poGaugeShapes = (Gauge*)olcjam2025::GetInstance().GetObject(m_GaugeShapesGUID);
+    Gauge* poGaugeShapes = (Gauge*)olcjam2025::GetInstance().GetObject("GaugeShapes");
     if (m_collection.empty())
     {
         AddTrack("VacuumFireShapeShootingBlankTrack");
@@ -284,16 +268,16 @@ void VacuumHead::OnCollide(ScrollObject* _poCollider, orxBODY_PART* _pstPart, or
 
         if (orxString_SearchString(_poCollider->GetName(), "Negative"))
         {
-            ScrollObject* poVessel = olcjam2025::GetInstance().GetObject(olcjam2025::GetInstance().GetActiveVesselID());
+            ScrollObject* poVessel = olcjam2025::GetInstance().GetObject("Vessel");
             poVessel->AddTrack("VesselDamageBlowTrack");
             _poCollider->SetLifeTime(orxFLOAT_0);
 
-            Gauge* poGaugeHealth = (Gauge*)olcjam2025::GetInstance().GetObject(m_GaugeHealthGUID);
+            Gauge* poGaugeHealth = (Gauge*)olcjam2025::GetInstance().GetObject("GaugeHealth");
             poGaugeHealth->Decrement(((Shape*)_poCollider)->GetShapeDamageBlow());
         }
         else 
         {
-            Gauge* poGaugeShapes = (Gauge*)olcjam2025::GetInstance().GetObject(m_GaugeShapesGUID);
+            Gauge* poGaugeShapes = (Gauge*)olcjam2025::GetInstance().GetObject("GaugeShapes");
             poGaugeShapes->SetCurrentValue(poGaugeShapes->GetCurrentValue() + 1.0f);
 
             m_collection.push(_poCollider->GetGUID());

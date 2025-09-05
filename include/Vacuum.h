@@ -36,9 +36,6 @@ private:
     orxU64          m_vacuumHeadGUID;
     orxU64          m_vacuumBeamGUID;
 
-    orxU64          m_GaugeShapesGUID;
-    orxU64          m_GaugeHealthGUID;
-
     void            SetIsBeamActive(orxBOOL isBeamActive);
 };
 
@@ -64,10 +61,6 @@ private:
 
     orxFLOAT        m_DepositDelay;
     orxFLOAT        m_WaitForDeposit;
-
-    orxU64          m_GaugeShapesGUID;
-    orxU64          m_GaugeDepositGUID;
-    orxU64          m_GaugeHealthGUID;
 
     std::stack<orxU64> m_collection;
 };
